@@ -25,7 +25,6 @@ use GuzzleHttp\Client;
 const GITHUB_CONTRIBUTORS_POINT = 'https://api.github.com/repos/{repository}/contributors';
 const GITHUB_USERS_POINT = 'https://api.github.com/users/{login}';
 const REGEX = '/=([[:digit:]]+)>; rel="last"/';
-const AUTH = 'dc4c5f46fd0f58cc88c75884006000c5809d5f39';
 
 /**
  * @author Mickaël Andrieu <andrieu.travail@gmail.com>
