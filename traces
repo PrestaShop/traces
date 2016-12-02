@@ -1,0 +1,87 @@
+#!/usr/bin/env php
+<?php
+function includeIfExists($file)
+{
+    if (file_exists($file)) {
+        return include $file;
+    }
+}
+
+if ((!$loader = includeIfExists(__DIR__.'/vendor/autoload.php')) && (!$loader = includeIfExists(__DIR__.'/../../autoload.php'))) {
+    die('You must set up the project dependencies, run the following commands:'.PHP_EOL.
+        'curl -sS https://getcomposer.org/installer | php'.PHP_EOL.
+        'php composer.phar install'.PHP_EOL);
+}
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Filesystem\Filesystem;
+
+use GuzzleHttp\Client;
+
+const GITHUB_CONTRIBUTORS_POINT = 'https://api.github.com/repos/{repository}/contributors';
+const GITHUB_USERS_POINT = 'https://api.github.com/users/{login}';
+const REGEX = '/=([[:digit:]]+)>; rel="last"/';
+const AUTH = 'dc4c5f46fd0f58cc88c75884006000c5809d5f39';
+
+/**
+ * @author Mickaël Andrieu <andrieu.travail@gmail.com>
+ * 
+ * A simple CLI tool to generate information about GitHub contributors of a repository.
+ */
+(new Application('traces', '1.0.0'))
+  ->register('traces')
+      ->setDescription('A simple CLI tool to generate information about GitHub contributors of a repository.')
+      ->addArgument('repository', InputArgument::REQUIRED, 'GitHub repository, for instance PrestaShop/PrestaShop')
+      ->addArgument('user', InputArgument::REQUIRED, 'GitHub username, for instance `johndoe`')
+      ->addArgument('password', InputArgument::REQUIRED, 'GitHub password, for instance `secr3tSt0rY`')
+      ->setCode(function(InputInterface $input, OutputInterface $output) {
+          $io = new SymfonyStyle($input, $output);
+
+          $repository = $input->getArgument('repository');
+          $user = $input->getArgument('user');
+          $password = $input->getArgument('password');
+
+          $authHeaders = ['auth' => [$user, $password]];
+          $requestUri = str_replace('{repository}', $repository, GITHUB_CONTRIBUTORS_POINT);
+
+          $client = new Client(['timeout'  => 2.0,]);
+          $response = $client->get($requestUri);
+
+          if ('application/json; charset=utf-8' === $response->getHeader('Content-Type')[0]) {
+              if($response->hasHeader('Link')){
+                  $headerValue = $response->getHeader('Link')[0];
+                  preg_match(REGEX, $headerValue, $matches);
+                  $nbPages = $matches[1];
+                  $allContributors = [];
+
+                  for ($i = 1; $i <= $nbPages; $i++) {
+                      $response = $client->get($requestUri . '?page=' . $i, $authHeaders);
+                      $contributors = json_decode($response->getBody(), true);
+                      $allContributors = array_merge($allContributors, $contributors);
+                  }
+
+                  $users = [];
+                  foreach($allContributors as $contributor) {
+                      $requestUri = str_replace('{login}', $contributor['login'], GITHUB_USERS_POINT);
+                      $response = $client->get($requestUri, $authHeaders);
+
+                      $user = json_decode($response->getBody(), true);
+                      $user['contributions'] = $contributor['contributions'];
+
+                      $users[] = $user;
+                  }
+
+                  $fs = new Filesystem();
+                  $fs->dumpFile('contributors.js', json_encode($users, JSON_PRETTY_PRINT));
+              }
+          }
+
+          $io->success(sprintf('%s contributors found for the repository "%s".', count($users), $repository));
+      })
+  ->getApplication()
+  ->setDefaultCommand('traces', true)
+->run();
