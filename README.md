@@ -9,7 +9,7 @@ Traces is a micro CLI application that is able to get all contributors and their
 The authentication is a basic login/password for GitHub.
  
 ```bash
- $ composer install prestashop/traces
+ $ composer require prestashop/traces
  
  $ ./vendor/bin/traces <repository> <login> <password>
 ```
