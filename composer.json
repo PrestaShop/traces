@@ -5,6 +5,7 @@
     "require": {
         "symfony/console": "v3.2.0",
         "symfony/filesystem": "v3.2.0",
+        "symfony/yaml": "v3.2.0",
         "guzzlehttp/guzzle": "~6.0"
     },
     "license": "MIT",

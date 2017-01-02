@@ -16,9 +16,11 @@ if ((!$loader = includeIfExists(__DIR__.'/vendor/autoload.php')) && (!$loader = 
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Yaml\Yaml;
 
 use GuzzleHttp\Client;
 
@@ -37,12 +39,15 @@ const REGEX = '/=([[:digit:]]+)>; rel="last"/';
       ->addArgument('repository', InputArgument::REQUIRED, 'GitHub repository, for instance PrestaShop/PrestaShop')
       ->addArgument('user', InputArgument::REQUIRED, 'GitHub username, for instance `johndoe`')
       ->addArgument('password', InputArgument::REQUIRED, 'GitHub password, for instance `secr3tSt0rY`')
+      ->addOption('config', null, InputOption::VALUE_REQUIRED, 'Configuration file, for exclusions')
       ->setCode(function(InputInterface $input, OutputInterface $output) {
           $io = new SymfonyStyle($input, $output);
 
           $repository = $input->getArgument('repository');
           $user = $input->getArgument('user');
           $password = $input->getArgument('password');
+
+          $config = $input->getOption('config');
 
           $authHeaders = ['auth' => [$user, $password]];
           $requestUri = str_replace('{repository}', $repository, GITHUB_CONTRIBUTORS_POINT);
@@ -64,7 +69,12 @@ const REGEX = '/=([[:digit:]]+)>; rel="last"/';
                   }
 
                   $users = [];
+                  $excludes = $config ? Yaml::parse(file_get_contents($config))['config']['exclusions'] : [];
+
                   foreach($allContributors as $contributor) {
+                      if (in_array($contributor['login'], $excludes)) {
+                          continue;
+                      }
                       $requestUri = str_replace('{login}', $contributor['login'], GITHUB_USERS_POINT);
                       $response = $client->get($requestUri, $authHeaders);
 

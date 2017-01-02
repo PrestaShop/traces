@@ -1,3 +1,5 @@
 contributors.js
+config.yml
 composer.lock
 /vendor/
+.idea/
