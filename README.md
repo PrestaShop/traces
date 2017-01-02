@@ -11,8 +11,7 @@ The authentication is a basic login/password for GitHub.
 ```bash
  $ composer require prestashop/traces
  
- $ ./vendor/bin/traces <repository> <login> <password>
+ $ ./vendor/bin/traces <repositoryOwner/repositoryName> <login> <password>
 ```
  
-A ``contributor.js`` file will be generated, you can manipulate it using any programming language.
-
+A file named ``contributors.js`` will be generated, you can manipulate it using any programming language.
