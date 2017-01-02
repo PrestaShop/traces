@@ -1,7 +1,7 @@
 {
     "name": "prestashop/traces",
     "description": "A simple CLI tool to generate information about GitHub contributors of a repository",
-    "type": "cli application",
+    "type": "project",
     "require": {
         "symfony/console": "v3.2.0",
         "symfony/filesystem": "v3.2.0",
