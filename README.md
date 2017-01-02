@@ -11,9 +11,9 @@ The authentication is a basic login/password for GitHub.
 ```bash
  $ composer require prestashop/traces
  
- $ ./vendor/bin/traces <repository> <login> <password> --config="config.yml"
+ $ ./vendor/bin/traces <repositoryOwner/repositoryName> <login> <password> --config="config.yml"
 ```
  
 You can configure a list of excluded contributors, take a look to ```config.dist.yml``` file.
-A ``contributor.js`` file will be generated, you can manipulate it using any programming language.
-
+ 
+A file named ``contributors.js`` will be generated, you can manipulate it using any programming language.
