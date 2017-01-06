@@ -69,6 +69,7 @@ const REGEX = '/=([[:digit:]]+)>; rel="last"/';
                   }
 
                   $users = [];
+                  var_dump(Yaml::parse(file_get_contents($config))['config']['exclusions']);
                   $excludes = $config ? Yaml::parse(file_get_contents($config))['config']['exclusions'] : [];
 
                   foreach($allContributors as $contributor) {
