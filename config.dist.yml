@@ -1,5 +1,7 @@
 config:
   exclusions:
+    - 'fchellypresta'
+    - 'TMMeilleur'
     - 'gRoussac'
     - 'rGaillard'
     - 'vAugagneur'
