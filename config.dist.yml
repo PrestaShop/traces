@@ -1,6 +1,10 @@
 config:
   exclusions:
     - 'fchellypresta'
+    - 'creack'
+    - 'anat'
+    - 'DrySs'
+    - 'mmoustai'
     - 'TMMeilleur'
     - 'gRoussac'
     - 'rGaillard'
