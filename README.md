@@ -1,6 +1,6 @@
 # Traces
 
-Traces is a micro CLI application that is able to get all contributors and their contributors in 
+Traces is a micro CLI application that is able to get all contributors and their contributions in 
 "developer-readable" JSON format for a specified repository.
  
  
