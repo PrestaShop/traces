@@ -1,5 +1,12 @@
 config:
   exclusions:
+    - 'jolelievre'
+    - 'matks'
+    - 'Azouz-Jribi'
+    - 'PSAddonsTeam'
+    - 'alegout'
+    - 'toutantic'
+    - 'hadrich-hatem'
     - 'eternoendless'
     - 'LittleBigDev'
     - 'fouratachour'
