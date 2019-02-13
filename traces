@@ -33,13 +33,14 @@ const REGEX = '/=([[:digit:]]+)>; rel="last"/';
  * 
  * A simple CLI tool to generate information about GitHub contributors of a repository.
  */
-(new Application('traces', '1.0.0'))
+(new Application('traces', '1.1.0'))
   ->register('traces')
       ->setDescription('A simple CLI tool to generate information about GitHub contributors of a repository.')
       ->addArgument('repository', InputArgument::REQUIRED, 'GitHub repository, for instance PrestaShop/PrestaShop')
       ->addArgument('user', InputArgument::REQUIRED, 'GitHub username, for instance `johndoe`')
       ->addArgument('password', InputArgument::REQUIRED, 'GitHub password, for instance `secr3tSt0rY`')
-      ->addOption('config', null, InputOption::VALUE_REQUIRED, 'Configuration file, for exclusions')
+      ->addOption('config', 'c', InputOption::VALUE_REQUIRED, 'Configuration file, for exclusions')
+      ->addOption('timeout', 't', InputOption::VALUE_REQUIRED, 'Process timeout, in seconds', 2.0)
       ->setCode(function(InputInterface $input, OutputInterface $output) {
           $io = new SymfonyStyle($input, $output);
 
@@ -48,11 +49,12 @@ const REGEX = '/=([[:digit:]]+)>; rel="last"/';
           $password = $input->getArgument('password');
 
           $config = $input->getOption('config');
+          $timeout = $input->getOption('timeout');
 
           $authHeaders = ['auth' => [$user, $password]];
           $requestUri = str_replace('{repository}', $repository, GITHUB_CONTRIBUTORS_POINT);
 
-          $client = new Client(['timeout'  => 2.0,]);
+          $client = new Client(['timeout'  => $timeout,]);
           $response = $client->get($requestUri);
 
           if ('application/json; charset=utf-8' === $response->getHeader('Content-Type')[0]) {
@@ -72,7 +74,7 @@ const REGEX = '/=([[:digit:]]+)>; rel="last"/';
                   $excludes = $config ? Yaml::parse(file_get_contents($config))['config']['exclusions'] : [];
 
                   foreach($allContributors as $contributor) {
-                      if (in_array($contributor['login'], $excludes)) {
+                      if (in_array($contributor['login'], $excludes, true)) {
                           continue;
                       }
                       $requestUri = str_replace('{login}', $contributor['login'], GITHUB_USERS_POINT);
