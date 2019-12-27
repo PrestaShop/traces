@@ -19,5 +19,10 @@
             "email": "andrieu.travail@gmail.com"
         }
     ],
-    "bin": ["traces"]
+    "bin": ["traces"],
+    "config": {
+        "platform": {
+            "php": "7.1.0"
+        }
+    }
 }
