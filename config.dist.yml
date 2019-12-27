@@ -9,6 +9,7 @@ config:
     - 'blog'
     - 'location'
     - 'bio'
+  extractEmailDomain: true
   keepExcludedUsers: false
   exclusions:
     - 'AlexEven'

@@ -27,6 +27,7 @@ Option | Description
 exclusions | List of excluded users.
 keepExcludedUsers | Set to `true` to flag excluded contributors instead of filtering them out from the output.
 fieldsWhitelist | List of fields to keep from the API result. Leave blank if you want to keep them all.
+extractEmailDomain | Set to `true` to extract the user's email domain and include it in the generated file
 
 ## License
 
