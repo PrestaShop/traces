@@ -1,4 +1,15 @@
 config:
+  fieldsWhitelist:
+    - 'login'
+    - 'id'
+    - 'avatar_url'
+    - 'html_url'
+    - 'name'
+    - 'company'
+    - 'blog'
+    - 'location'
+    - 'bio'
+  keepExcludedUsers: false
   exclusions:
     - 'AlexEven'
     - 'AntoineMille'

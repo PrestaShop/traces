@@ -14,10 +14,14 @@ function includeIfExists($file)
     }
 }
 
-if ((!$loader = includeIfExists(__DIR__.'/vendor/autoload.php')) && (!$loader = includeIfExists(__DIR__.'/../../autoload.php'))) {
-    die('You must set up the project dependencies, run the following commands:'.PHP_EOL.
-        'curl -sS https://getcomposer.org/installer | php'.PHP_EOL.
-        'php composer.phar install'.PHP_EOL);
+if ((!$loader = includeIfExists(__DIR__ . '/vendor/autoload.php')) && (!$loader = includeIfExists(
+        __DIR__ . '/../../autoload.php'
+    ))) {
+    die(
+        'You must set up the project dependencies, run the following commands:' . PHP_EOL .
+        'curl -sS https://getcomposer.org/installer | php' . PHP_EOL .
+        'php composer.phar install' . PHP_EOL
+    );
 }
 
 use Symfony\Component\Console\Application;
@@ -36,65 +40,108 @@ const GITHUB_USERS_POINT = 'https://api.github.com/users/{login}';
 const REGEX = '/=([[:digit:]]+)>; rel="last"/';
 
 (new Application('traces', '1.1.1'))
-  ->register('traces')
-      ->setDescription('A simple CLI tool to generate information about GitHub contributors of a repository.')
-      ->addArgument('repository', InputArgument::REQUIRED, 'GitHub repository, for instance PrestaShop/PrestaShop')
-      ->addArgument('user', InputArgument::REQUIRED, 'GitHub username, for instance `johndoe`')
-      ->addArgument('password', InputArgument::REQUIRED, 'GitHub password, for instance `secr3tSt0rY`')
-      ->addOption('config', 'c', InputOption::VALUE_REQUIRED, 'Configuration file, for exclusions')
-      ->addOption('timeout', 't', InputOption::VALUE_REQUIRED, 'Process timeout, in seconds', 2.0)
-      ->setCode(function(InputInterface $input, OutputInterface $output) {
-          $io = new SymfonyStyle($input, $output);
+    ->register('traces')
+    ->setDescription('A simple CLI tool to generate information about GitHub contributors of a repository.')
+    ->addArgument('repository', InputArgument::REQUIRED, 'GitHub repository, for instance PrestaShop/PrestaShop')
+    ->addArgument('user', InputArgument::REQUIRED, 'GitHub username, for instance `johndoe`')
+    ->addArgument('password', InputArgument::REQUIRED, 'GitHub password, for instance `secr3tSt0rY`')
+    ->addOption('config', 'c', InputOption::VALUE_REQUIRED, 'Configuration file, for exclusions')
+    ->addOption('timeout', 't', InputOption::VALUE_REQUIRED, 'Request timeout, in seconds', 2.0)
+    ->setCode(
+        function (InputInterface $input, OutputInterface $output) {
+            $io = new SymfonyStyle($input, $output);
 
-          $repository = $input->getArgument('repository');
-          $user = $input->getArgument('user');
-          $password = $input->getArgument('password');
+            $repository = $input->getArgument('repository');
+            $user = $input->getArgument('user');
+            $password = $input->getArgument('password');
 
-          $config = $input->getOption('config');
-          $timeout = $input->getOption('timeout');
+            $configFile = $input->getOption('config');
+            $timeout = $input->getOption('timeout');
 
-          $authHeaders = ['auth' => [$user, $password]];
-          $requestUri = str_replace('{repository}', $repository, GITHUB_CONTRIBUTORS_POINT);
+            // load settings from configuration file
+            list(
+                $exclusions,
+                $keepExcludedUsers,
+                $fieldsWhitelist
+            ) = (function ($file) {
+                if (empty($file)) {
+                    return [];
+                }
+                if (!file_exists($file) || !is_readable($file)) {
+                    throw new RuntimeException(sprintf('File "%s" doesn\'t exist or is not readable', $file));
+                }
+                $config = Yaml::parse(file_get_contents($file))['config'] ?? [];
 
-          $client = new Client(['timeout'  => $timeout,]);
-          $response = $client->get($requestUri);
+                return [
+                    $config['exclusions'] ?? [],
+                    $config['keepExcludedUsers'] ?? false,
+                    $config['fieldsWhitelist'] ? array_flip($config['fieldsWhitelist']) : [],
+                ];
+            })(
+                $configFile
+            );
 
-          if ('application/json; charset=utf-8' === $response->getHeader('Content-Type')[0]) {
-              if($response->hasHeader('Link')){
-                  $headerValue = $response->getHeader('Link')[0];
-                  preg_match(REGEX, $headerValue, $matches);
-                  $nbPages = $matches[1];
-                  $allContributors = [];
+            $authHeaders = ['auth' => [$user, $password]];
+            $requestUri = str_replace('{repository}', $repository, GITHUB_CONTRIBUTORS_POINT);
 
-                  for ($i = 1; $i <= $nbPages; $i++) {
-                      $response = $client->get($requestUri . '?page=' . $i, $authHeaders);
-                      $contributors = json_decode($response->getBody(), true);
-                      $allContributors = array_merge($allContributors, $contributors);
-                  }
+            $client = new Client(['timeout' => $timeout,]);
 
-                  $users = [];
-                  $excludes = $config ? Yaml::parse(file_get_contents($config))['config']['exclusions'] : [];
+            $io->text('Loading contributors...');
+            $response = $client->get($requestUri);
 
-                  foreach($allContributors as $contributor) {
-                      if (in_array($contributor['login'], $excludes, true)) {
-                          continue;
-                      }
-                      $requestUri = str_replace('{login}', $contributor['login'], GITHUB_USERS_POINT);
-                      $response = $client->get($requestUri, $authHeaders);
+            if ('application/json; charset=utf-8' === $response->getHeader('Content-Type')[0]) {
+                if ($response->hasHeader('Link')) {
+                    $headerValue = $response->getHeader('Link')[0];
+                    preg_match(REGEX, $headerValue, $matches);
+                    $nbPages = $matches[1];
+                    $users = [];
 
-                      $user = json_decode($response->getBody(), true);
-                      $user['contributions'] = $contributor['contributions'];
+                    $io->progressStart($nbPages);
 
-                      $users[] = $user;
-                  }
+                    for ($i = 1; $i <= $nbPages; $i++) {
+                        $response = $client->get($requestUri . '?page=' . $i, $authHeaders);
+                        $contributors = json_decode($response->getBody(), true);
 
-                  $fs = new Filesystem();
-                  $fs->dumpFile('contributors.js', json_encode($users, JSON_PRETTY_PRINT));
-              }
-          }
+                        foreach ($contributors as $contributor) {
+                            // skip user if excluded
+                            if (!$keepExcludedUsers && in_array($contributor['login'], $exclusions, true)) {
+                                continue;
+                            }
+                            $userRequestUri = str_replace('{login}', $contributor['login'], GITHUB_USERS_POINT);
+                            $response = $client->get($userRequestUri, $authHeaders);
 
-          $io->success(sprintf('%s contributors found for the repository "%s".', count($users), $repository));
-      })
-  ->getApplication()
-  ->setDefaultCommand('traces', true)
-->run();
+                            $user = json_decode($response->getBody(), true);
+
+                            // clean up response if whitelist is defined
+                            if (!empty($fieldsWhitelist)) {
+                                $user = array_intersect_key($user, $fieldsWhitelist);
+                            }
+
+                            // add exclusion property if setting enabled
+                            if ($keepExcludedUsers) {
+                                $user['excluded'] = in_array($contributor['login'], $exclusions, true);
+                            }
+
+                            $user['contributions'] = $contributor['contributions'];
+
+                            $users[] = $user;
+                        }
+
+                        $io->progressAdvance(1);
+                    }
+
+                    $io->progressFinish();
+
+                    $io->text('Writing to file...');
+
+                    $fs = new Filesystem();
+                    $fs->dumpFile('contributors.js', json_encode($users, JSON_PRETTY_PRINT));
+                }
+            }
+
+            $io->success(sprintf('%s contributors found for the repository "%s".', count($users), $repository));
+        }
+    )
+    ->getApplication()
+    ->setDefaultCommand('traces', true)
+    ->run();
