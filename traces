@@ -1,5 +1,12 @@
 #!/usr/bin/env php
 <?php
+/**
+ * A simple CLI tool to generate information about GitHub contributors of a repository.
+ *
+ * @author PrestaShop SA <contact@prestashop.com>
+ * @author Mickaël Andrieu <andrieu.travail@gmail.com>
+ */
+
 function includeIfExists($file)
 {
     if (file_exists($file)) {
@@ -28,11 +35,6 @@ const GITHUB_CONTRIBUTORS_POINT = 'https://api.github.com/repos/{repository}/con
 const GITHUB_USERS_POINT = 'https://api.github.com/users/{login}';
 const REGEX = '/=([[:digit:]]+)>; rel="last"/';
 
-/**
- * @author Mickaël Andrieu <andrieu.travail@gmail.com>
- *
- * A simple CLI tool to generate information about GitHub contributors of a repository.
- */
 (new Application('traces', '1.1.1'))
   ->register('traces')
       ->setDescription('A simple CLI tool to generate information about GitHub contributors of a repository.')

@@ -11,6 +11,10 @@
     "license": "MIT",
     "authors": [
         {
+            "name": "PrestaShop SA",
+            "email": "contact@prestashop.com"
+        },
+        {
             "name": "Mickaël Andrieu",
             "email": "andrieu.travail@gmail.com"
         }
