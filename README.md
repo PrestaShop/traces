@@ -13,6 +13,8 @@ The authentication is a basic login/password for GitHub.
  
  $ ./vendor/bin/traces <repositoryOwner/repositoryName> <login> <password> --config="config.yml"
 ```
+
+> Note: If your Github login uses two-factor authentication, use an API token instead of password
  
 You can configure a list of excluded contributors, take a look to ```config.dist.yml``` file.
  
