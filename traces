@@ -30,10 +30,10 @@ const REGEX = '/=([[:digit:]]+)>; rel="last"/';
 
 /**
  * @author Mickaël Andrieu <andrieu.travail@gmail.com>
- * 
+ *
  * A simple CLI tool to generate information about GitHub contributors of a repository.
  */
-(new Application('traces', '1.1.0'))
+(new Application('traces', '1.1.1'))
   ->register('traces')
       ->setDescription('A simple CLI tool to generate information about GitHub contributors of a repository.')
       ->addArgument('repository', InputArgument::REQUIRED, 'GitHub repository, for instance PrestaShop/PrestaShop')
