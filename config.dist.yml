@@ -11,4 +11,6 @@ config:
     - 'bio'
   extractEmailDomain: true
   keepExcludedUsers: false
+  excludeRepositories:
+    - "PrestaShop/PrestaShop-1.6"
   exclusions: []

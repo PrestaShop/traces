@@ -24,6 +24,7 @@ if ((!$loader = includeIfExists(__DIR__ . '/vendor/autoload.php')) && (!$loader 
     );
 }
 
+use GuzzleHttp\Client;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,126 +34,231 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
-use GuzzleHttp\Client;
-
 const GITHUB_CONTRIBUTORS_POINT = 'https://api.github.com/repos/{repository}/contributors';
+const GITHUB_REPOSITORIES_POINT = 'https://api.github.com/orgs/{organization}/repos';
 const GITHUB_USERS_POINT = 'https://api.github.com/users/{login}';
 const REGEX = '/=([[:digit:]]+)>; rel="last"/';
 
-(new Application('traces', '2.0.1'))
+/**
+ * Fetch repositories from an organization
+ * @param SymfonyStyle $io
+ * @param Client $client
+ * @param array $authHeaders
+ * @param array $excludeRepositories
+ * @param string $organization
+ * @return array
+ */
+function fetchOrganizationRepositories(
+    SymfonyStyle $io,
+    Client $client,
+    array $authHeaders,
+    array $excludeRepositories,
+    string $organization
+): array {
+    $orgRepositories = [];
+
+    $requestUri = str_replace('{organization}', $organization, GITHUB_REPOSITORIES_POINT);
+    $response = $client->get($requestUri, $authHeaders);
+    if ($response->getStatusCode() !== 200) {
+        return $orgRepositories;
+    }
+
+    // Number of pages
+    if ($response->hasHeader('Link')) {
+        $headerValue = $response->getHeader('Link')[0];
+        preg_match(REGEX, $headerValue, $matches);
+        $nbPages = $matches[1];
+    } else {
+        $nbPages = 1;
+    }
+
+    // Fetch pages
+    $io->progressStart($nbPages);
+    for ($i = 1; $i <= $nbPages; $i++) {
+        $response = $client->get($requestUri . '?page=' . $i, $authHeaders);
+        $repositories = json_decode($response->getBody(), true);
+        foreach ($repositories as $repository) {
+            if ($repository['archived'] || $repository['private']|| $repository['fork']) {
+                continue;
+            }
+            if (in_array($repository['full_name'], $excludeRepositories)) {
+                continue;
+            }
+            $orgRepositories[] = $repository['full_name'];
+        }
+        $io->progressAdvance();
+    }
+    $io->progressFinish();
+
+    return $orgRepositories;
+}
+
+/**
+ * @param Client $client
+ * @param array $authHeaders
+ * @param string $repository
+ * @return array
+ */
+function fetchRepositoryContributors(
+    Client $client,
+    array $authHeaders,
+    string $repository
+) {
+    $contributors = [];
+    $requestUri = str_replace('{repository}', $repository, GITHUB_CONTRIBUTORS_POINT);
+    $response = $client->get($requestUri, $authHeaders);
+    if ($response->getStatusCode() !== 200) {
+        return $contributors;
+    }
+    if ($response->hasHeader('Link')) {
+        $headerValue = $response->getHeader('Link')[0];
+        preg_match(REGEX, $headerValue, $matches);
+        $nbPages = $matches[1];
+    } else {
+        $nbPages = 1;
+    }
+
+    for ($i = 1; $i <= $nbPages; $i++) {
+        $response = $client->get($requestUri . '?page=' . $i, $authHeaders);
+        $contributors = array_merge(
+            $contributors,
+            json_decode($response->getBody(), true)
+        );
+    }
+    return $contributors;
+}
+
+/**
+ * @param string $file
+ * @return array
+ */
+function fetchConfiguration(string $file): array {
+    if (empty($file)) {
+        return [];
+    }
+    if (!file_exists($file) || !is_readable($file)) {
+        throw new RuntimeException(sprintf('File "%s" doesn\'t exist or is not readable', $file));
+    }
+    $config = Yaml::parse(file_get_contents($file))['config'] ?? [];
+
+    return [
+        $config['exclusions'] ?? [],
+        $config['keepExcludedUsers'] ?? false,
+        $config['extractEmailDomain'] ?? false,
+        $config['fieldsWhitelist'] ? array_flip($config['fieldsWhitelist']) : [],
+        $config['excludeRepositories'] ?? [],
+    ];
+}
+
+(new Application('traces', '2.1.0'))
     ->register('traces')
-    ->setDescription('A simple CLI tool to generate information about GitHub contributors of a repository.')
-    ->addArgument('repository', InputArgument::REQUIRED, 'GitHub repository, for instance PrestaShop/PrestaShop')
+    ->setDescription('A simple CLI tool to generate information about GitHub contributors of an organization.')
     ->addArgument('user', InputArgument::REQUIRED, 'GitHub username, for instance `johndoe`')
     ->addArgument('password', InputArgument::REQUIRED, 'GitHub password, for instance `secr3tSt0rY`')
+    ->addOption('organization', 'o',InputOption::VALUE_OPTIONAL, 'GitHub organization')
+    ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'GitHub repository')
     ->addOption('config', 'c', InputOption::VALUE_REQUIRED, 'Configuration file, for exclusions')
     ->addOption('timeout', 't', InputOption::VALUE_REQUIRED, 'Request timeout, in seconds', 2.0)
     ->setCode(
         function (InputInterface $input, OutputInterface $output) {
             $io = new SymfonyStyle($input, $output);
 
-            $repository = $input->getArgument('repository');
             $user = $input->getArgument('user');
             $password = $input->getArgument('password');
 
+            $organization = $input->getOption('organization');
+            $repository = $input->getOption('repository');
             $configFile = $input->getOption('config');
             $timeout = $input->getOption('timeout');
 
-            // load settings from configuration file
-            list(
-                $exclusions,
-                $keepExcludedUsers,
-                $extractEmailDomain,
-                $fieldsWhitelist
-            ) = (function ($file) {
-                if (empty($file)) {
-                    return [];
-                }
-                if (!file_exists($file) || !is_readable($file)) {
-                    throw new RuntimeException(sprintf('File "%s" doesn\'t exist or is not readable', $file));
-                }
-                $config = Yaml::parse(file_get_contents($file))['config'] ?? [];
-
-                return [
-                    $config['exclusions'] ?? [],
-                    $config['keepExcludedUsers'] ?? false,
-                    $config['extractEmailDomain'] ?? false,
-                    $config['fieldsWhitelist'] ? array_flip($config['fieldsWhitelist']) : [],
-                ];
-            })(
-                $configFile
-            );
-
-            $authHeaders = ['auth' => [$user, $password]];
-            $requestUri = str_replace('{repository}', $repository, GITHUB_CONTRIBUTORS_POINT);
-
-            $client = new Client(['timeout' => $timeout,]);
-
-            $io->text('Loading contributors...');
-            $response = $client->get($requestUri);
-
-            if ('application/json; charset=utf-8' === $response->getHeader('Content-Type')[0]) {
-                if ($response->hasHeader('Link')) {
-                    $headerValue = $response->getHeader('Link')[0];
-                    preg_match(REGEX, $headerValue, $matches);
-                    $nbPages = $matches[1];
-                    $users = [];
-
-                    $io->progressStart($nbPages);
-
-                    for ($i = 1; $i <= $nbPages; $i++) {
-                        $response = $client->get($requestUri . '?page=' . $i, $authHeaders);
-                        $contributors = json_decode($response->getBody(), true);
-
-                        foreach ($contributors as $contributor) {
-                            // skip user if excluded
-                            if (!$keepExcludedUsers && in_array($contributor['login'], $exclusions, true)) {
-                                continue;
-                            }
-                            $userRequestUri = str_replace('{login}', $contributor['login'], GITHUB_USERS_POINT);
-                            $response = $client->get($userRequestUri, $authHeaders);
-
-                            $user = json_decode($response->getBody(), true);
-
-                            // extract mail domain
-                            $userEmailDomain = '';
-                            if ($extractEmailDomain && !empty($user['email'])) {
-                               $userEmailDomain = substr($user['email'], strpos($user['email'], '@') + 1);
-                            }
-
-                            // clean up response if whitelist is defined
-                            if (!empty($fieldsWhitelist)) {
-                                $user = array_intersect_key($user, $fieldsWhitelist);
-                            }
-
-                            // add exclusion property if setting enabled
-                            if ($keepExcludedUsers) {
-                                $user['excluded'] = in_array($contributor['login'], $exclusions, true);
-                            }
-
-                            // add mail domain if setting enabled
-                            if ($extractEmailDomain) {
-                                $user['email_domain'] = $userEmailDomain;
-                            }
-
-                            $user['contributions'] = $contributor['contributions'];
-
-                            $users[] = $user;
-                        }
-
-                        $io->progressAdvance(1);
-                    }
-
-                    $io->progressFinish();
-
-                    $io->text('Writing to file...');
-
-                    $fs = new Filesystem();
-                    $fs->dumpFile('contributors.js', json_encode($users, JSON_PRETTY_PRINT));
-                }
+            if (empty($organization) && empty($repository)) {
+                $io->warning('Please define organization (-o/--organization) or repository (-r/--repository) option');
+                return;
             }
 
-            $io->success(sprintf('%s contributors found for the repository "%s".', count($users), $repository));
+            // load settings from configuration file
+            list(
+                $confExclusions,
+                $confKeepExcludedUsers,
+                $confExtractEmailDomain,
+                $confFieldsWhitelist,
+                $confExcludeRepositories
+            ) = fetchConfiguration($configFile);
+
+            $authHeaders = ['auth' => [$user, $password]];
+            $client = new Client(['timeout' => $timeout,]);
+
+            $io->text('Loading repositories...');
+            if (!empty($repository)) {
+                $orgRepositories = [$repository];
+            } else {
+                $orgRepositories = fetchOrganizationRepositories(
+                    $io,
+                    $client,
+                    $authHeaders,
+                    $confExcludeRepositories,
+                    $organization
+                );
+            }
+
+            $io->text('Loading contributors...');
+
+            $users = [];
+            $io->progressStart(count($orgRepositories));
+            foreach ($orgRepositories as $repository) {
+                $contributors = fetchRepositoryContributors($client, $authHeaders, $repository);
+                foreach ($contributors as $contributor) {
+                    // skip user if excluded
+                    if (!$confKeepExcludedUsers && in_array($contributor['login'], $confExclusions, true)) {
+                        continue;
+                    }
+                    if (!array_key_exists($contributor['login'], $users)) {
+                        $userRequestUri = str_replace('{login}', $contributor['login'], GITHUB_USERS_POINT);
+                        $response = $client->get($userRequestUri, $authHeaders);
+                        $user = json_decode($response->getBody(), true);
+                        $userEmail = $user['email'];
+
+                        // Clean up response if whitelist is defined
+                        if (!empty($confFieldsWhitelist)) {
+                            $user = array_intersect_key($user, $confFieldsWhitelist);
+                        }
+
+                        // Add mail domain if setting enabled
+                        if ($confExtractEmailDomain) {
+                            $user['email_domain'] = empty($userEmail)
+                                ? ''
+                                : substr($userEmail, strpos($userEmail, '@') + 1);
+                        }
+
+                        // add exclusion property if setting enabled
+                        if ($confKeepExcludedUsers) {
+                            $user['excluded'] = in_array($contributor['login'], $confExclusions, true);
+                        }
+
+                        $user['contributions'] = 0;
+                        $user['repositories'] = [];
+
+                        $users[$contributor['login']] = $user;
+                    }
+                    $users[$contributor['login']]['contributions'] += $contributor['contributions'];
+                    $users[$contributor['login']]['repositories'][$repository] = $contributor['contributions'];
+                }
+                $io->progressAdvance();
+            }
+            $io->progressFinish();
+
+            $io->success(sprintf('%s contributors found for the organization "%s".', count($users), $organization));
+
+            usort($users, function($userA, $userB) {
+                if ($userA['contributions'] == $userB['contributions']) {
+                    return 0;
+                }
+                return ($userA['contributions'] > $userB['contributions']) ? -1 : 1;
+            });
+
+            $io->text('Writing to file...');
+            $fs = new Filesystem();
+            $fs->dumpFile('contributors.js', json_encode($users, JSON_PRETTY_PRINT));
         }
     )
     ->getApplication()
