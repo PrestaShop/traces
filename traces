@@ -39,7 +39,7 @@ const GITHUB_CONTRIBUTORS_POINT = 'https://api.github.com/repos/{repository}/con
 const GITHUB_USERS_POINT = 'https://api.github.com/users/{login}';
 const REGEX = '/=([[:digit:]]+)>; rel="last"/';
 
-(new Application('traces', '2.0.0'))
+(new Application('traces', '2.0.1'))
     ->register('traces')
     ->setDescription('A simple CLI tool to generate information about GitHub contributors of a repository.')
     ->addArgument('repository', InputArgument::REQUIRED, 'GitHub repository, for instance PrestaShop/PrestaShop')
