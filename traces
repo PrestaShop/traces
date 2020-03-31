@@ -150,7 +150,7 @@ function fetchConfiguration(string $file): array {
     ];
 }
 
-(new Application('traces', '2.1.0'))
+(new Application('traces', '3.0.0'))
     ->register('traces')
     ->setDescription('A simple CLI tool to generate information about GitHub contributors of an organization.')
     ->addArgument('user', InputArgument::REQUIRED, 'GitHub username, for instance `johndoe`')
