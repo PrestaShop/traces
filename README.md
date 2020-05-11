@@ -1,20 +1,23 @@
 # Traces
 
-Traces is a micro CLI application that is able to get all contributors and their contributions in 
-"developer-readable" JSON format for a specified repository.
+Traces is a micro CLI application that is able to get all contributors and their contributions in "developer-readable" JSON format for a specified repository.
  
  
 ## Installation
  
 The authentication is a basic login/password for GitHub.
+
+> Note: If your Github login uses two-factor authentication, use an API token instead of password
  
 ```bash
  $ composer require prestashop/traces
  
- $ ./vendor/bin/traces <repositoryOwner/repositoryName> <login> <password> --config="config.yml"
+ # Check a repository
+ $ ./vendor/bin/traces <login> <password> -o <repositoryOwner/repositoryName> --config="config.yml"
+ 
+ # Check an organization
+ $ ./vendor/bin/traces <login> <password> -r <repositoryOwner> --config="config.yml"
 ```
-
-> Note: If your Github login uses two-factor authentication, use an API token instead of password
 
 A file named ``contributors.js`` will be generated, you can manipulate it using any programming language.
 
