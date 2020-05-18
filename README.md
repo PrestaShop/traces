@@ -13,10 +13,10 @@ The authentication is a basic login/password for GitHub.
  $ composer require prestashop/traces
  
  # Check a repository
- $ ./vendor/bin/traces <login> <password> -o <repositoryOwner/repositoryName> --config="config.yml"
+ $ ./vendor/bin/traces -u <login> -p <password> -o <repositoryOwner/repositoryName> --config="config.yml"
  
  # Check an organization
- $ ./vendor/bin/traces <login> <password> -r <repositoryOwner> --config="config.yml"
+ $ ./vendor/bin/traces -u <login> -p <password> -r <repositoryOwner> --config="config.yml"
 ```
 
 A file named ``contributors.js`` will be generated, you can manipulate it using any programming language.
