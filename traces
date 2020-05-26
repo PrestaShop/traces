@@ -26,7 +26,6 @@ if ((!$loader = includeIfExists(__DIR__ . '/vendor/autoload.php')) && (!$loader 
 
 use GuzzleHttp\Client;
 use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -150,11 +149,11 @@ function fetchConfiguration(string $file): array {
     ];
 }
 
-(new Application('traces', '3.0.0'))
+(new Application('traces', '4.0.0'))
     ->register('traces')
     ->setDescription('A simple CLI tool to generate information about GitHub contributors of an organization.')
-    ->addArgument('user', InputArgument::REQUIRED, 'GitHub username, for instance `johndoe`')
-    ->addArgument('password', InputArgument::REQUIRED, 'GitHub password, for instance `secr3tSt0rY`')
+    ->addOption('user', 'u', InputOption::VALUE_REQUIRED, 'GitHub username, for instance `johndoe`')
+    ->addOption('password', 'p', InputOption::VALUE_OPTIONAL, 'GitHub password, for instance `secr3tSt0rY`', '')
     ->addOption('organization', 'o',InputOption::VALUE_OPTIONAL, 'GitHub organization')
     ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'GitHub repository')
     ->addOption('config', 'c', InputOption::VALUE_REQUIRED, 'Configuration file, for exclusions')
@@ -163,9 +162,8 @@ function fetchConfiguration(string $file): array {
         function (InputInterface $input, OutputInterface $output) {
             $io = new SymfonyStyle($input, $output);
 
-            $user = $input->getArgument('user');
-            $password = $input->getArgument('password');
-
+            $user = $input->getOption('user');
+            $password = $input->getOption('password');
             $organization = $input->getOption('organization');
             $repository = $input->getOption('repository');
             $configFile = $input->getOption('config');
@@ -188,10 +186,10 @@ function fetchConfiguration(string $file): array {
             $authHeaders = ['auth' => [$user, $password]];
             $client = new Client(['timeout' => $timeout,]);
 
-            $io->text('Loading repositories...');
             if (!empty($repository)) {
                 $orgRepositories = [$repository];
             } else {
+                $io->text('Loading repositories...');
                 $orgRepositories = fetchOrganizationRepositories(
                     $io,
                     $client,
@@ -247,7 +245,11 @@ function fetchConfiguration(string $file): array {
             }
             $io->progressFinish();
 
-            $io->success(sprintf('%s contributors found for the organization "%s".', count($users), $organization));
+            if (!empty($organization)) {
+                $io->success(sprintf('%s contributors found for the organization "%s".', count($users), $organization));
+            } else {
+                $io->success(sprintf('%s contributors found for the repository "%s".', count($users), $repository));
+            }
 
             usort($users, function($userA, $userB) {
                 if ($userA['contributions'] == $userB['contributions']) {
