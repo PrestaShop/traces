@@ -2,6 +2,7 @@
     "name": "prestashop/traces",
     "description": "A simple CLI tool to generate information about GitHub contributors of a repository",
     "type": "project",
+    "keywords": ["contributors", "prestashop"],
     "require": {
         "symfony/console": "v3.2.0",
         "symfony/filesystem": "v3.2.0",
@@ -14,10 +15,6 @@
         {
             "name": "PrestaShop SA",
             "email": "contact@prestashop.com"
-        },
-        {
-            "name": "Mickaël Andrieu",
-            "email": "andrieu.travail@gmail.com"
         }
     ],
     "bin": ["traces"],
