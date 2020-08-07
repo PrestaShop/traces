@@ -257,6 +257,7 @@ function fetchConfiguration(string $file): array {
                 }
                 return ($userA['contributions'] > $userB['contributions']) ? -1 : 1;
             });
+            $users['updatedAt'] = date('Y-m-d H:i:s');
 
             $io->text('Writing to file...');
             $fs = new Filesystem();
