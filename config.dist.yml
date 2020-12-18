@@ -13,4 +13,9 @@ config:
   keepExcludedUsers: false
   excludeRepositories:
     - "PrestaShop/PrestaShop-1.6"
-  exclusions: []
+  exclusions:
+    - dependabot
+    - dependabot[bot]
+    - dependabot-preview
+    - gitbook-bot
+    - ps-jarvis
