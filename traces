@@ -228,7 +228,6 @@ const REPOSITORIES_CATEGORIES = [
     ],
     'others' => [
         'PrestaShop/prestashop.github.io',
-        'PrestaShop/solrsearch',
         'PrestaShop/community-theme-16',
         'PrestaShop/performance-project',
         'PrestaShop/engineering',
