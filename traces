@@ -37,6 +37,203 @@ const GITHUB_CONTRIBUTORS_POINT = 'https://api.github.com/repos/{repository}/con
 const GITHUB_REPOSITORIES_POINT = 'https://api.github.com/orgs/{organization}/repos';
 const GITHUB_USERS_POINT = 'https://api.github.com/users/{login}';
 const REGEX = '/=([[:digit:]]+)>; rel="last"/';
+const REPOSITORIES_CATEGORIES = [
+    'core' => [
+        'PrestaShop/PrestaShop',
+        'PrestaShop/prestashop-icon-font',
+        'PrestaShop/smarty',
+        'PrestaShop/prestashop-ui-kit',
+        'PrestaShop/TranslationToolsBundle',
+        'PrestaShop/LocalizationFiles',
+        'PrestaShop/stylelint-config',
+        'PrestaShop/stylelint-browser-compatibility',
+        'PrestaShop/jquery.live-polyfill',
+        'PrestaShop/circuit-breaker',
+        'PrestaShop/eslint-config',
+        'PrestaShop/php-dev-tools',
+        'PrestaShop/TranslationFiles',
+        'PrestaShop/decimal',
+        'PrestaShop/php-ps-info',
+    ],
+    'specs' => [
+        'PrestaShop/prestashop-specs',
+    ],
+    'documentation' => [
+        'PrestaShop/paymentexample',
+        'PrestaShop/docs',
+        'PrestaShop/user-documentation-en',
+        'PrestaShop/user-documentation-fr',
+        'PrestaShop/user-documentation-es',
+        'PrestaShop/user-documentation-it',
+        'PrestaShop/user-documentation-nl',
+        'PrestaShop/user-documentation-fa',
+        'PrestaShop/ADR',
+        'PrestaShop/test-scenarios',
+        'PrestaShop/example-modules',
+        'PrestaShop/prestashop-retro',
+        'PrestaShop/open-source',
+        'PrestaShop/example_module_mailtheme',
+        'PrestaShop/childtheme-example',
+        'PrestaShop/module-companion',
+    ],
+    'modules' => [
+        'PrestaShop/PrestaShop-modules',
+        'PrestaShop/blockcontactinfos',
+        'PrestaShop/blockfacebook',
+        'PrestaShop/blocklink',
+        'PrestaShop/blockmyaccountfooter',
+        'PrestaShop/blockpaymentlogo',
+        'PrestaShop/blockpermanentlinks',
+        'PrestaShop/blocksharefb',
+        'PrestaShop/blockstore',
+        'PrestaShop/blocktags',
+        'PrestaShop/dashactivity',
+        'PrestaShop/dashgoals',
+        'PrestaShop/dashproducts',
+        'PrestaShop/dashtrends',
+        'PrestaShop/graphnvd3',
+        'PrestaShop/gridhtml',
+        'PrestaShop/pagesnotfound',
+        'PrestaShop/productpaymentlogos',
+        'PrestaShop/sekeywords',
+        'PrestaShop/statsbestcategories',
+        'PrestaShop/statsbestcustomers',
+        'PrestaShop/statsbestmanufacturers',
+        'PrestaShop/statsbestproducts',
+        'PrestaShop/statsbestsuppliers',
+        'PrestaShop/statsbestvouchers',
+        'PrestaShop/statscarrier',
+        'PrestaShop/statscatalog',
+        'PrestaShop/statscheckup',
+        'PrestaShop/statsdata',
+        'PrestaShop/statsequipment',
+        'PrestaShop/statsforecast',
+        'PrestaShop/statslive',
+        'PrestaShop/statsnewsletter',
+        'PrestaShop/statsorigin',
+        'PrestaShop/statspersonalinfos',
+        'PrestaShop/statsproduct',
+        'PrestaShop/statsregistrations',
+        'PrestaShop/statssales',
+        'PrestaShop/statssearch',
+        'PrestaShop/statsstock',
+        'PrestaShop/statsvisits',
+        'PrestaShop/themeconfigurator',
+        'PrestaShop/trackingfront',
+        'PrestaShop/vatnumber',
+        'PrestaShop/blockwishlist',
+        'PrestaShop/carriercompare',
+        'PrestaShop/cashondelivery',
+        'PrestaShop/dateofdelivery',
+        'PrestaShop/editorial',
+        'PrestaShop/favoriteproducts',
+        'PrestaShop/followup',
+        'PrestaShop/gamification',
+        'PrestaShop/gapi',
+        'PrestaShop/loyalty',
+        'PrestaShop/mailalerts',
+        'PrestaShop/newsletter',
+        'PrestaShop/productcomments',
+        'PrestaShop/pscleaner',
+        'PrestaShop/referralprogram',
+        'PrestaShop/sendtoafriend',
+        'PrestaShop/autoupgrade',
+        'PrestaShop/watermark',
+        'PrestaShop/gsitemap',
+        'PrestaShop/ganalytics',
+        'PrestaShop/prestafraud',
+        'PrestaShop/pssupport',
+        'PrestaShop/eurovatgenerator',
+        'PrestaShop/securitypatch',
+        'PrestaShop/contactform',
+        'PrestaShop/welcome',
+        'PrestaShop/blockreassurance',
+        'PrestaShop/ps_sharebuttons',
+        'PrestaShop/ps_socialfollow',
+        'PrestaShop/ps_linklist',
+        'PrestaShop/ps_customtext',
+        'PrestaShop/ps_contactinfo',
+        'PrestaShop/ps_emailsubscription',
+        'PrestaShop/ps_banner',
+        'PrestaShop/ps_featuredproducts',
+        'PrestaShop/ps_imageslider',
+        'PrestaShop/ps_mainmenu',
+        'PrestaShop/ps_customersignin',
+        'PrestaShop/ps_categorytree',
+        'PrestaShop/ps_legalcompliance',
+        'PrestaShop/ps_wirepayment',
+        'PrestaShop/ps_shoppingcart',
+        'PrestaShop/ps_currencyselector',
+        'PrestaShop/ps_languageselector',
+        'PrestaShop/ps_facetedsearch',
+        'PrestaShop/ps_customeraccountlinks',
+        'PrestaShop/ps_searchbar',
+        'PrestaShop/ps_checkpayment',
+        'PrestaShop/ps_emailalerts',
+        'PrestaShop/ps_rssfeed',
+        'PrestaShop/ps_bestsellers',
+        'PrestaShop/ps_advertising',
+        'PrestaShop/ps_brandlist',
+        'PrestaShop/ps_categoryproducts',
+        'PrestaShop/ps_newproducts',
+        'PrestaShop/ps_specials',
+        'PrestaShop/ps_supplierlist',
+        'PrestaShop/ps_crossselling',
+        'PrestaShop/ps_productinfo',
+        'PrestaShop/ps_dataprivacy',
+        'PrestaShop/ps_cashondelivery',
+        'PrestaShop/ps_carriercomparison',
+        'PrestaShop/ps_viewedproduct',
+        'PrestaShop/ps_feeder',
+        'PrestaShop/ps_reminder',
+        'PrestaShop/ps_searchbarjqauto',
+        'PrestaShop/ps_buybuttonlite',
+        'PrestaShop/ps_faviconnotificationbo',
+        'PrestaShop/ps_healthcheck',
+        'PrestaShop/ps_qualityassurance',
+        'PrestaShop/ps_emailgenerator',
+        'PrestaShop/pstagger',
+        'PrestaShop/ps_emailsmanager',
+        'PrestaShop/ps_livetranslation',
+        'PrestaShop/ps_googleanalytics',
+        'PrestaShop/ps_themecusto',
+    ],
+    'tools' => [
+        'PrestaShop/PrestaShop-webservice-lib',
+        'PrestaShop/module-generator',
+        'PrestaShop/live-demo-devices',
+        'PrestaShop/docker',
+        'PrestaShop/docker-ci',
+        'PrestaShop/azure-template-performance',
+        'PrestaShop/azure-template-high-performance',
+        'PrestaShop/azure-template-basic',
+        'PrestaShop/docker-internal-images',
+        'PrestaShop/docker-templates',
+        'PrestaShop/TopContributors',
+        'PrestaShop/prestonbot',
+        'PrestaShop/issuebot',
+        'PrestaShop/traces',
+        'PrestaShop/travis-status-board',
+        'PrestaShop/prestashop-shop-creator',
+        'PrestaShop/mjml-theme-converter',
+        'PrestaShop/nightly-board',
+        'PrestaShop/github-webhook-parser',
+        'PrestaShop/presthubot-ui',
+        'PrestaShop/presthubot',
+        'PrestaShop/QANightlyResults',
+        'PrestaShop/core-weekly-generator',
+        'PrestaShop/email-templates-sdk',
+        'PrestaShop/fontmanager',
+        'PrestaShop/vagrant',
+    ],
+    'others' => [
+        'PrestaShop/prestashop.github.io',
+        'PrestaShop/community-theme-16',
+        'PrestaShop/performance-project',
+        'PrestaShop/engineering',
+        'PrestaShop/.github',
+    ]
+];
 
 /**
  * Fetch repositories from an organization
@@ -202,16 +399,31 @@ function fetchConfiguration(string $file): array {
             $io->text('Loading contributors...');
 
             $users = [];
+            $categories = [];
+            foreach (REPOSITORIES_CATEGORIES as $section => $repositories) {
+                $categories[$section] = [
+                    'total' => 0,
+                    'repositories' => [],
+                ];
+                foreach ($repositories as $repository) {
+                    $categories[$section]['repositories'][$repository] = 0;
+                }
+            }
             $io->progressStart(count($orgRepositories));
             foreach ($orgRepositories as $repository) {
+                $section = array_reduce(array_keys(REPOSITORIES_CATEGORIES), function($carry, $item) use ($repository) {
+                    return in_array($repository, REPOSITORIES_CATEGORIES[$item]) ? $item : $carry;
+                }, 'others');
+                
                 $contributors = fetchRepositoryContributors($client, $authHeaders, $repository);
                 foreach ($contributors as $contributor) {
+                    $keyUsers = $contributor['login'];
                     // skip user if excluded
-                    if (!$confKeepExcludedUsers && in_array($contributor['login'], $confExclusions, true)) {
+                    if (!$confKeepExcludedUsers && in_array($keyUsers, $confExclusions, true)) {
                         continue;
                     }
-                    if (!array_key_exists($contributor['login'], $users)) {
-                        $userRequestUri = str_replace('{login}', $contributor['login'], GITHUB_USERS_POINT);
+                    if (!array_key_exists($keyUsers, $users)) {
+                        $userRequestUri = str_replace('{login}', $keyUsers, GITHUB_USERS_POINT);
                         $response = $client->get($userRequestUri, $authHeaders);
                         $user = json_decode($response->getBody(), true);
                         $userEmail = $user['email'];
@@ -230,16 +442,19 @@ function fetchConfiguration(string $file): array {
 
                         // add exclusion property if setting enabled
                         if ($confKeepExcludedUsers) {
-                            $user['excluded'] = in_array($contributor['login'], $confExclusions, true);
+                            $user['excluded'] = in_array($keyUsers, $confExclusions, true);
                         }
 
                         $user['contributions'] = 0;
                         $user['repositories'] = [];
+                        $user['categories'] = $categories;
 
-                        $users[$contributor['login']] = $user;
+                        $users[$keyUsers] = $user;
                     }
-                    $users[$contributor['login']]['contributions'] += $contributor['contributions'];
-                    $users[$contributor['login']]['repositories'][$repository] = $contributor['contributions'];
+                    $users[$keyUsers]['contributions'] += $contributor['contributions'];
+                    $users[$keyUsers]['repositories'][$repository] = $contributor['contributions'];
+                    $users[$keyUsers]['categories'][$section]['total'] += $contributor['contributions'];
+                    $users[$keyUsers]['categories'][$section]['repositories'][$repository] += $contributor['contributions'];
                 }
                 $io->progressAdvance();
             }
@@ -249,6 +464,17 @@ function fetchConfiguration(string $file): array {
                 $io->success(sprintf('%s contributors found for the organization "%s".', count($users), $organization));
             } else {
                 $io->success(sprintf('%s contributors found for the repository "%s".', count($users), $repository));
+            }
+
+            // Clean
+            foreach ($users as &$user) {
+                foreach ($user['categories'] as $keySection => $section) {
+                    foreach ($section['repositories'] as $repository => $count) {
+                        if ($count == 0) {
+                            unset($user['categories'][$keySection]['repositories'][$repository]);
+                        }
+                    }
+                }
             }
 
             usort($users, function($userA, $userB) {
