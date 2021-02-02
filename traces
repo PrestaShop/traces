@@ -345,7 +345,7 @@ function fetchConfiguration(string $file): array {
     ];
 }
 
-(new Application('traces', '5.1.0'))
+(new Application('traces', '5.2.0'))
     ->register('traces')
     ->setDescription('A simple CLI tool to generate information about GitHub contributors of an organization.')
     ->addOption('user', 'u', InputOption::VALUE_REQUIRED, 'GitHub username, for instance `johndoe`')
