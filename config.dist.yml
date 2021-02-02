@@ -13,6 +13,7 @@ config:
   keepExcludedUsers: false
   excludeRepositories:
     - "PrestaShop/PrestaShop-1.6"
+    - "PrestaShop/PrestaShop-1.5"
   exclusions:
     - dependabot
     - dependabot[bot]
