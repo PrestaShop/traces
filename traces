@@ -413,7 +413,7 @@ function fetchConfiguration(string $file): array {
                 $section = array_reduce(array_keys(REPOSITORIES_CATEGORIES), function($carry, $item) use ($repository) {
                     return in_array($repository, REPOSITORIES_CATEGORIES[$item]) ? $item : $carry;
                 }, 'others');
-                
+
                 $contributors = fetchRepositoryContributors($client, $authHeaders, $repository);
                 foreach ($contributors as $contributor) {
                     $keyUsers = $contributor['login'];
@@ -453,6 +453,9 @@ function fetchConfiguration(string $file): array {
                     $users[$keyUsers]['contributions'] += $contributor['contributions'];
                     $users[$keyUsers]['repositories'][$repository] = $contributor['contributions'];
                     $users[$keyUsers]['categories'][$section]['total'] += $contributor['contributions'];
+                    if(!array_key_exists($repository, $users[$keyUsers]['categories'][$section]['repositories'])) {
+                        $users[$keyUsers]['categories'][$section]['repositories'][$repository] = 0;
+                    }
                     $users[$keyUsers]['categories'][$section]['repositories'][$repository] += $contributor['contributions'];
                 }
                 $io->progressAdvance();
