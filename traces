@@ -75,6 +75,11 @@ const REPOSITORIES_CATEGORIES = [
         'PrestaShop/childtheme-example',
         'PrestaShop/module-companion',
     ],
+    'themes' => [
+        'PrestaShop/classic-theme',
+        'PrestaShop/theme-refacto',
+        'PrestaShop/community-theme-16',
+    ],
     'modules' => [
         'PrestaShop/PrestaShop-modules',
         'PrestaShop/blockcontactinfos',
@@ -227,7 +232,6 @@ const REPOSITORIES_CATEGORIES = [
     ],
     'others' => [
         'PrestaShop/prestashop.github.io',
-        'PrestaShop/community-theme-16',
         'PrestaShop/performance-project',
         'PrestaShop/engineering',
         'PrestaShop/.github',
