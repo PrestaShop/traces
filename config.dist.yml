@@ -18,6 +18,8 @@ config:
     - dependabot
     - dependabot[bot]
     - dependabot-preview
+    - dependabot-preview[bot]
     - gitbook-bot
     - ps-jarvis
     - github-actions[bot]
+    - prestonBot
