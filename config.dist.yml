@@ -20,3 +20,4 @@ config:
     - dependabot-preview
     - gitbook-bot
     - ps-jarvis
+    - github-actions[bot]
