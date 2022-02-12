@@ -24,14 +24,15 @@ if ((!$loader = includeIfExists(__DIR__ . '/vendor/autoload.php')) && (!$loader 
 }
 
 use GuzzleHttp\Client;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
+const GITHUB_PULLS_POINT = 'https://api.github.com/repos/{repository}/pulls';
 const GITHUB_CONTRIBUTORS_POINT = 'https://api.github.com/repos/{repository}/contributors';
 const GITHUB_REPOSITORIES_POINT = 'https://api.github.com/orgs/{organization}/repos';
 const GITHUB_USERS_POINT = 'https://api.github.com/users/{login}';
@@ -298,6 +299,50 @@ function fetchOrganizationRepositories(
  * @param string $repository
  * @return array
  */
+function fetchRepositoryPulls(
+    Client $client,
+    array $authHeaders,
+    string $repository
+) {
+    $contributors = [];
+    $requestUri = str_replace('{repository}', $repository, GITHUB_PULLS_POINT);
+    $response = $client->get($requestUri . '?per_page=100&state=closed', $authHeaders);
+    if ($response->getStatusCode() !== 200) {
+        return $contributors;
+    }
+    if ($response->hasHeader('Link')) {
+        $headerValue = $response->getHeader('Link')[0];
+        preg_match(REGEX, $headerValue, $matches);
+        $nbPages = $matches[1];
+    } else {
+        $nbPages = 1;
+    }
+
+    for ($i = 1; $i <= $nbPages; $i++) {
+        $response = $client->get($requestUri . '?state=closed&per_page=100&page=' . $i, $authHeaders);
+        $pulls = json_decode($response->getBody(), false);
+        foreach ($pulls as $pull) {
+            if ($pull->merged_at !== null) {
+                if (!isset($contributors[$pull->user->login])) {
+                    $contributors[$pull->user->login] = [
+                        'login' => $pull->user->login,
+                        'contributions' => 0,
+                    ];
+                }
+
+                $contributors[$pull->user->login]['contributions']++;
+            }
+        }
+    }
+    return $contributors;
+}
+
+/**
+ * @param Client $client
+ * @param array $authHeaders
+ * @param string $repository
+ * @return array
+ */
 function fetchRepositoryContributors(
     Client $client,
     array $authHeaders,
@@ -418,7 +463,7 @@ function fetchConfiguration(string $file): array {
                     return in_array($repository, REPOSITORIES_CATEGORIES[$item]) ? $item : $carry;
                 }, 'others');
 
-                $contributors = fetchRepositoryContributors($client, $authHeaders, $repository);
+                $contributors = fetchRepositoryPulls($client, $authHeaders, $repository);
                 foreach ($contributors as $contributor) {
                     $keyUsers = $contributor['login'];
                     // skip user if excluded
