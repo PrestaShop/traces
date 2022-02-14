@@ -8,3 +8,6 @@ GitHub contributors:
 - Rémi Gaillard
 - Thomas N
 - atomiix
+- Mathieu Ferment
+- Jonathan Danse
+- Vincent Garcia
