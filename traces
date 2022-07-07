@@ -77,8 +77,8 @@ const REPOSITORIES_CATEGORIES = [
     ],
     'themes' => [
         'PrestaShop/classic-theme',
-        'PrestaShop/theme-refacto',
         'PrestaShop/community-theme-16',
+        'PrestaShop/hummingbird',
     ],
     'modules' => [
         'PrestaShop/PrestaShop-modules',
