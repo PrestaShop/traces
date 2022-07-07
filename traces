@@ -201,6 +201,7 @@ const REPOSITORIES_CATEGORIES = [
         'PrestaShop/ps_livetranslation',
         'PrestaShop/ps_googleanalytics',
         'PrestaShop/ps_themecusto',
+        'PrestaShop/psgdpr',
     ],
     'tools' => [
         'PrestaShop/PrestaShop-webservice-lib',
