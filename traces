@@ -230,6 +230,7 @@ const REPOSITORIES_CATEGORIES = [
         'PrestaShop/email-templates-sdk',
         'PrestaShop/fontmanager',
         'PrestaShop/vagrant',
+        'PrestaShop/ps-monitor-module-releases',
     ],
     'others' => [
         'PrestaShop/prestashop.github.io',
