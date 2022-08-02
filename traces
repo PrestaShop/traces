@@ -219,7 +219,6 @@ const REPOSITORIES_CATEGORIES = [
         'PrestaShop/live-demo-devices',
         'PrestaShop/mjml-theme-converter',
         'PrestaShop/module-generator',
-        'PrestaShop/native-modules',
         'PrestaShop/nightly-board',
         'PrestaShop/PrestaShop-webservice-lib',
         'PrestaShop/prestashop-shop-creator',
