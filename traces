@@ -237,6 +237,7 @@ const REPOSITORIES_CATEGORIES = [
         'PrestaShop/performance-project',
         'PrestaShop/engineering',
         'PrestaShop/.github',
+        'PrestaShop/ps-org-theme',
     ]
 ];
 
@@ -351,7 +352,7 @@ function fetchConfiguration(string $file): array {
     ];
 }
 
-(new Application('traces', '5.2.2'))
+(new Application('traces', '5.2.3'))
     ->register('traces')
     ->setDescription('A simple CLI tool to generate information about GitHub contributors of an organization.')
     ->addOption('user', 'u', InputOption::VALUE_REQUIRED, 'GitHub username, for instance `johndoe`')
