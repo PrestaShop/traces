@@ -74,6 +74,12 @@ const REPOSITORIES_CATEGORIES = [
         'PrestaShop/example_module_mailtheme',
         'PrestaShop/childtheme-example',
         'PrestaShop/module-companion',
+        'PrestaShop/user-documentation-v8-en',
+        'PrestaShop/user-documentation-v8-fr',
+        'PrestaShop/user-documentation-v8-es',
+        'PrestaShop/user-documentation-v8-it',
+        'PrestaShop/user-documentation-v8-nl',
+        'PrestaShop/user-documentation-v8-fa',
     ],
     'themes' => [
         'PrestaShop/classic-theme',
