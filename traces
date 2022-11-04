@@ -280,7 +280,7 @@ function fetchOrganizationRepositories(
         $response = $client->get($requestUri . '?page=' . $i, $authHeaders);
         $repositories = json_decode($response->getBody(), true);
         foreach ($repositories as $repository) {
-            if ($repository['private'] || $repository['fork']) {
+            if ($repository['private'] || $repository['fork'] || $repository['archived']) {
                 continue;
             }
             if (in_array($repository['full_name'], $excludeRepositories)) {
