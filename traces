@@ -231,6 +231,7 @@ const REPOSITORIES_CATEGORIES = [
         'PrestaShop/traces',
         'PrestaShop/travis-status-board',
         'PrestaShop/vagrant',
+        'PrestaShop/kanbanbot',
     ],
     'others' => [
         'PrestaShop/prestashop.github.io',
