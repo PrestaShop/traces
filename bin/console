@@ -1,0 +1,21 @@
+#!/usr/bin/env php
+<?php
+require_once __DIR__ . '/../vendor/autoload.php';
+ 
+use PrestaShop\Traces\Command\FetchContributorsCommand;
+use PrestaShop\Traces\Command\FetchRepositoriesCommand;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Dotenv\Dotenv;
+
+
+define('APPVAR_DIR', dirname(__DIR__) . '/var');
+
+if (file_exists(__DIR__.'/../.env')) {
+    $dotenv = new Dotenv();
+    $dotenv->load(__DIR__.'/../.env');
+}
+ 
+$app = new Application();
+$app->add(new FetchContributorsCommand());
+$app->add(new FetchRepositoriesCommand());
+$app->run();

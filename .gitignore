@@ -1,4 +1,9 @@
-contributors.js
 config.yml
+/var/cache
 /vendor/
 .idea/
+.env
+
+# Generated files
+contributors.js
+gh_repositories.json
