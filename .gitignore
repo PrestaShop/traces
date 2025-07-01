@@ -1,8 +1,13 @@
-config.yml
-/var/cache
-/vendor/
 .idea/
+
+# PHP
+/var/cache/
+/vendor/
+.php-cs-fixer.cache
 .env
+
+# Config
+config.yml
 
 # Generated files
 contributors.js

@@ -1,8 +1,11 @@
 <?php
+
 namespace PrestaShop\Traces\Service;
 
 use Cache\Adapter\Filesystem\FilesystemCachePool;
-use Exception;
+use Github\Api\GraphQL;
+use Github\Api\Repo;
+use Github\Api\User;
 use Github\Client;
 use Github\Exception\RuntimeException;
 use Github\ResultPager;
@@ -11,53 +14,61 @@ use League\Flysystem\Filesystem;
 
 class Github
 {
-  /**
-   * @var Client;
-   */
-  protected $client;
+    /**
+     * @var Client
+     */
+    protected $client;
 
-  public function __construct(string $cacheDir, string $ghToken = null)
-  {
-      $filesystemAdapter = new Local($cacheDir);
-      $filesystem = new Filesystem($filesystemAdapter);
-      $pool = new FilesystemCachePool($filesystem);
+    public function __construct(string $cacheDir, ?string $ghToken = null)
+    {
+        $filesystemAdapter = new Local($cacheDir);
+        $filesystem = new Filesystem($filesystemAdapter);
+        $pool = new FilesystemCachePool($filesystem);
 
-      $this->client = new Client();
-      $this->client->addCache($pool);
+        $this->client = new Client();
+        $this->client->addCache($pool);
 
-      if (!empty($ghToken)) {
-          $this->client->authenticate($ghToken, null, Client::AUTH_ACCESS_TOKEN);
-      }
-  }
+        if (!empty($ghToken)) {
+            $this->client->authenticate($ghToken, null, Client::AUTH_ACCESS_TOKEN);
+        }
+    }
 
-  public function getClient(): Client
-  {
-      return $this->client;
-  }
+    public function getClient(): Client
+    {
+        return $this->client;
+    }
 
-  public function apiSearchGraphQL(string $graphQLQuery): array
-  {
-      do {
-          try {
-              $resultPage = $this->client->api('graphql')->execute($graphQLQuery, []);
-          } catch (\RuntimeException $e) {
-          }
-      } while (!isset($resultPage));
+    public function apiSearchGraphQL(string $graphQLQuery): array
+    {
+        /** @var GraphQL $clientGraphQL */
+        $clientGraphQL = $this->client->api('graphql');
+        do {
+            try {
+                $resultPage = $clientGraphQL->execute($graphQLQuery, []);
+            } catch (RuntimeException $e) {
+            }
+        } while (!isset($resultPage));
 
-      return $resultPage ?? [];
-  }
+        return $resultPage;
+    }
 
-  public function getContributors(string $repository): array
-  {
-    $repositoryArr = explode('/', $repository);
-    $paginator  = new ResultPager($this->client);
-    $response = $paginator->fetchAll($this->client->api('repo'), 'contributors', ['PrestaShop', $repository]);
+    public function getContributors(string $repository): array
+    {
+        /** @var Repo $clientRepo */
+        $clientRepo = $this->client->api('repo');
 
-    return $response;
-  }
+        $repositoryArr = explode('/', $repository);
+        $paginator = new ResultPager($this->client);
+        $response = $paginator->fetchAll($clientRepo, 'contributors', ['PrestaShop', $repository]);
 
-  public function getUser(string $login): array
-  {
-    return $this->client->api('user')->show($login);
-  }
+        return $response;
+    }
+
+    public function getUser(string $login): array
+    {
+        /** @var User $clientUser */
+        $clientUser = $this->client->api('user');
+
+        return $clientUser->show($login);
+    }
 }
