@@ -1,0 +1,49 @@
+name: PHP
+on: 
+    push:
+        branches:
+            - master
+    pull_request:
+
+jobs:
+  php-cs-fixer:
+    name: PHP CS Fixer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.3
+          extensions: xml
+
+      - uses: actions/checkout@v4
+
+      -   name: Validate composer config
+          run: composer validate --strict
+
+      -   name: Composer Install
+          run: composer global require friendsofphp/php-cs-fixer
+
+      -   name: Add environment path
+          run: export PATH="$PATH:$HOME/.composer/vendor/bin"
+
+      -   name: Run PHPCSFixer
+          run: php-cs-fixer fix --dry-run --diff
+
+  phpstan:
+    name: PHP Static Analysis
+    runs-on: ubuntu-latest
+    steps:
+        -   name: Setup PHP
+            uses: shivammathur/setup-php@v2
+            with:
+                php-version: 8.4
+                extensions: xml
+
+        -   uses: actions/checkout@v4
+
+        -   name: Composer Install
+            run: composer install --ansi --prefer-dist --no-interaction --no-progress
+
+        -   name: Run phpstan
+            run: ./vendor/bin/phpstan analyse -c phpstan.neon.dist

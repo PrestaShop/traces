@@ -1,0 +1,15 @@
+parameters:
+  level: 6
+  bootstrapFiles:
+    - vendor/autoload.php
+  paths:
+    - bin
+    - src
+  reportUnmatchedIgnoredErrors: false
+  scanFiles:
+    - bin/console
+  ignoreErrors:
+    -
+      identifier: missingType.iterableValue
+      path: src/Service/Github.php
+      count: 3
