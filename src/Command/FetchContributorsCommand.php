@@ -184,6 +184,9 @@ class FetchContributorsCommand extends Command
             'ps_googleanalytics',
             'ps_themecusto',
             'psgdpr',
+            'ps_apiresources',
+            'ps_distributionapiclient',
+            'ps_fixturescreator',
         ],
         'tools' => [
             'azure-template-basic',
@@ -210,13 +213,22 @@ class FetchContributorsCommand extends Command
             'ps-monitor-module-releases',
             'QANightlyResults',
             'TopContributors',
+            'TopTranslators',
             'traces',
             'travis-status-board',
             'vagrant',
             'kanbanbot',
+            'psssst',
+            'SeamlessUpgradeToolbox',
+        ],
+        'tests' => [
+            'ui-testing-library',
+            'ga.tests.ui.pr',
+        ],
+        'blog' => [
+            'prestashop.github.io',
         ],
         'others' => [
-            'prestashop.github.io',
             'performance-project',
             'engineering',
             '.github',
