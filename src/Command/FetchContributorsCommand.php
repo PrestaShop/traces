@@ -219,7 +219,7 @@ class FetchContributorsCommand extends Command
             'vagrant',
             'kanbanbot',
             'psssst',
-            'SeamlessUpgradeToolbox'
+            'SeamlessUpgradeToolbox',
         ],
         'tests' => [
             'ui-testing-library',
