@@ -1,25 +1,36 @@
 # Traces
 
-Traces is a micro CLI application that is able to get all contributors and their contributions in "developer-readable" JSON format for a specified repository.
- 
+Traces is a Symfony CLI application that is able to :
+* fetch all repositories of the PrestaShop organization
+* fetch all contributors and their contributions in "developer-readable" JSON format for a specified repository
  
 ## Installation
  
-The authentication is a basic login/password for GitHub.
+The authentication use a Github Token.
 
-> Note: If your Github login uses two-factor authentication, use an API token instead of password
+> Note: You can fetch here : https://github.com/settings/tokens/new?description=traces&scopes=repo,read:org
  
 ```bash
  $ composer require prestashop/traces
+
+ # Fetch all repositories
+ $ php bin/console traces:fetch:repositories --ghToken=<ghtoken>
+ OR
+ $ GH_TOKEN=<ghtoken> php bin/console traces:fetch:repositories
+ OR
+ * Add GH_TOKEN=<ghtoken> in .env file
+ $ php bin/console traces:fetch:repositories
+ ## A file gh_repositories.json is generated
  
  # Check a repository
- $ ./vendor/bin/traces -u <login> -p <password> -r <repositoryOwner/repositoryName> --config="config.yml"
- 
- # Check an organization
- $ ./vendor/bin/traces -u <login> -p <password> -o <repositoryOwner> --config="config.yml"
+ $ php bin/console traces:fetch:contributors --ghToken=<ghtoken> -r <repositoryName> --config="config.yml"
+ OR
+ $ GH_TOKEN=<ghtoken> php bin/console traces:fetch:contributors -r <repositoryName> --config="config.yml"
+ OR
+ * Add GH_TOKEN=<ghtoken> in .env file
+ $ php bin/console traces:fetch:contributors -r <repositoryName> --config="config.yml"
+ ## A file contributors.js is generated
 ```
-
-A file named ``contributors.js`` will be generated, you can manipulate it using any programming language.
 
 ## Configuring
  

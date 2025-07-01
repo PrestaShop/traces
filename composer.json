@@ -4,11 +4,14 @@
     "type": "project",
     "keywords": ["contributors", "prestashop"],
     "require": {
-        "symfony/console": "v3.2.0",
-        "symfony/filesystem": "v3.2.0",
-        "symfony/yaml": "v3.2.0",
-        "guzzlehttp/guzzle": "~6.0",
-        "ext-json": "*"
+        "knplabs/github-api": "^3.14",
+        "symfony/http-client": "^7.1",
+        "nyholm/psr7": "^1.8",
+        "cache/filesystem-adapter": "^1.2",
+        "symfony/dotenv": "^7.1",
+        "symfony/console": "^7.1",
+        "ext-json": "*",
+        "symfony/yaml": "^7.3"
     },
     "license": "MIT",
     "authors": [
@@ -17,10 +20,17 @@
             "email": "contact@prestashop.com"
         }
     ],
-    "bin": ["traces"],
+    "autoload": {
+        "psr-4": {
+            "PrestaShop\\Traces\\": "src/"
+        }
+    },
     "config": {
         "platform": {
-            "php": "7.1.0"
+            "php": "8.4.0"
+        },
+        "allow-plugins": {
+            "php-http/discovery": true
         }
     }
 }
