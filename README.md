@@ -15,7 +15,7 @@ The authentication use a Github Token.
  $ composer require prestashop/traces
 
  # Fetch all repositories
- $ php bin/console traces:fetch:repositories --ghToken=<ghtoken>
+ $ php bin/console traces:fetch:repositories --ghtoken=<ghtoken>
  OR
  $ GH_TOKEN=<ghtoken> php bin/console traces:fetch:repositories
  OR
@@ -24,7 +24,7 @@ The authentication use a Github Token.
  ## A file gh_repositories.json is generated
  
  # Check a repository
- $ php bin/console traces:fetch:contributors --ghToken=<ghtoken> -r <repositoryName> --config="config.yml"
+ $ php bin/console traces:fetch:contributors --ghtoken=<ghtoken> -r <repositoryName> --config="config.yml"
  OR
  $ GH_TOKEN=<ghtoken> php bin/console traces:fetch:contributors -r <repositoryName> --config="config.yml"
  OR
@@ -33,7 +33,7 @@ The authentication use a Github Token.
  ## A file contributors.js is generated
 
  # Fetch all merged pullrequests
- $ php bin/console traces:fetch:pullrequests:merged --ghToken=<ghtoken>
+ $ php bin/console traces:fetch:pullrequests:merged --ghtoken=<ghtoken>
  OR
  $ GH_TOKEN=<ghtoken> php bin/console traces:fetch:pullrequests:merged
  OR
