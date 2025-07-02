@@ -2,7 +2,6 @@
 
 namespace PrestaShop\Traces\Command;
 
-use PrestaShop\Traces\Service\Github;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -10,11 +9,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FetchRepositoriesCommand extends Command
 {
-    /**
-     * @var Github
-     */
-    protected $github;
-
     protected function configure()
     {
         $this->setName('traces:fetch:repositories')
@@ -30,11 +24,12 @@ class FetchRepositoriesCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->github = new Github(APPVAR_DIR, $input->getOption('ghtoken'));
+        parent::execute($input, $output);
+
         $time = time();
 
         $repositories = $this->fetchOrgRepositories();
-        file_put_contents('gh_repositories.json', json_encode($repositories, JSON_PRETTY_PRINT));
+        file_put_contents(self::FILE_REPOSITORIES, json_encode($repositories, JSON_PRETTY_PRINT));
         $output->writeLn([
             count($repositories) . ' repositories fetched.',
             '',

@@ -3,6 +3,7 @@
 Traces is a Symfony CLI application that is able to :
 * fetch all repositories of the PrestaShop organization
 * fetch all contributors and their contributions in "developer-readable" JSON format for a specified repository
+* fetch all merged pull requests of the PrestaShop organization
  
 ## Installation
  
@@ -30,6 +31,15 @@ The authentication use a Github Token.
  * Add GH_TOKEN=<ghtoken> in .env file
  $ php bin/console traces:fetch:contributors -r <repositoryName> --config="config.yml"
  ## A file contributors.js is generated
+
+ # Fetch all merged pullrequests
+ $ php bin/console traces:fetch:pullrequests:merged --ghToken=<ghtoken>
+ OR
+ $ GH_TOKEN=<ghtoken> php bin/console traces:fetch:pullrequests:merged
+ OR
+ * Add GH_TOKEN=<ghtoken> in .env file
+ $ php bin/console traces:fetch:pullrequests:merged
+ ## A file gh_pullrequests.json is generated
 ```
 
 ## Configuring

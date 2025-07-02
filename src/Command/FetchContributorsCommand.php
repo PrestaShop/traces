@@ -2,7 +2,6 @@
 
 namespace PrestaShop\Traces\Command;
 
-use PrestaShop\Traces\Service\Github;
 use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
@@ -13,10 +12,6 @@ use Symfony\Component\Yaml\Yaml;
 
 class FetchContributorsCommand extends Command
 {
-    /**
-     * @var Github
-     */
-    protected $github;
 
     protected const REPOSITORIES_CATEGORIES = [
         'core' => [
@@ -272,6 +267,8 @@ class FetchContributorsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        parent::execute($input, $output);
+
         if (!file_exists('gh_repositories.json')) {
             $output->writeLn('gh_repositories.json is missing. Please execute `php bin/console traces:fetch:repositories`');
 
@@ -285,7 +282,6 @@ class FetchContributorsCommand extends Command
             $this->orgRepositories = json_decode(file_get_contents('gh_repositories.json') ?: '', true);
         }
 
-        $this->github = new Github(APPVAR_DIR, $input->getOption('ghtoken'));
         $time = time();
 
         $this->fetchConfiguration($input->getOption('config'));
