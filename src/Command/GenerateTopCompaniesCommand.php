@@ -2,9 +2,11 @@
 
 namespace PrestaShop\Traces\Command;
 
+use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class GenerateTopCompaniesCommand extends AbstractCommand
 {
@@ -23,6 +25,12 @@ class GenerateTopCompaniesCommand extends AbstractCommand
      */
     protected $companyEmployeesWOCompany = [];
 
+    /**
+     * @var array<string>
+     */
+    protected array $configExclusions = [];
+    protected bool $configKeepExcludedUsers = false;
+
     protected function configure()
     {
         $this
@@ -34,7 +42,8 @@ class GenerateTopCompaniesCommand extends AbstractCommand
                 InputOption::VALUE_OPTIONAL,
                 '',
                 $_ENV['GH_TOKEN'] ?? null
-            );
+            )
+            ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, '', 'config.dist.yml');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -62,6 +71,8 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             ),
         ]);
 
+        $this->fetchConfiguration($input->getOption('config'));
+
         // Clean PR Listing
         $numPRRemoved = 0;
         $companies = [];
@@ -76,11 +87,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             // Is a user a bot ?
             if ($datum['author'] === null
               || $datum['author']['login'] === null
-              || in_array($datum['author']['login'], [
-                  'dependabot',
-                  'dependabot-preview',
-                  'github-actions',
-              ])) {
+              || (!$this->configKeepExcludedUsers && in_array($datum['author']['login'], $this->configExclusions, true))) {
                 unset($key);
                 ++$numPRRemoved;
                 continue;
@@ -215,5 +222,19 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         }
 
         return '';
+    }
+
+    protected function fetchConfiguration(string $file): void
+    {
+        if (empty($file)) {
+            return;
+        }
+        if (!file_exists($file) || !is_readable($file)) {
+            throw new RuntimeException(sprintf('File "%s" doesn\'t exist or is not readable', $file));
+        }
+        $config = Yaml::parse(file_get_contents($file) ?: '')['config'] ?? [];
+
+        $this->configExclusions = $config['exclusions'] ?? [];
+        $this->configKeepExcludedUsers = $config['keepExcludedUsers'] ?? false;
     }
 }
