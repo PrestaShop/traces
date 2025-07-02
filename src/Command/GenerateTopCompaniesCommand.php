@@ -2,9 +2,11 @@
 
 namespace PrestaShop\Traces\Command;
 
+use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class GenerateTopCompaniesCommand extends AbstractCommand
 {
@@ -24,6 +26,12 @@ class GenerateTopCompaniesCommand extends AbstractCommand
      * @var array<string, array{numPRs: int, lastContribution: string}>
      */
     protected $companyEmployeesWOCompany = [];
+
+    /**
+     * @var array<string>
+     */
+    protected array $configExclusions = [];
+    protected bool $configKeepExcludedUsers = false;
 
     protected function configure()
     {
@@ -73,6 +81,8 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             ),
         ]);
 
+        $this->fetchConfiguration($input->getOption('config'));
+
         // Clean PR Listing
         $numPRRemoved = 0;
         $companies = [];
@@ -87,11 +97,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             // Is a user a bot ?
             if ($datum['author'] === null
               || $datum['author']['login'] === null
-              || in_array($datum['author']['login'], [
-                  'dependabot',
-                  'dependabot-preview',
-                  'github-actions',
-              ])) {
+              || (!$this->configKeepExcludedUsers && in_array($datum['author']['login'], $this->configExclusions, true))) {
                 unset($key);
                 ++$numPRRemoved;
                 continue;
