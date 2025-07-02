@@ -12,7 +12,6 @@ use Symfony\Component\Yaml\Yaml;
 
 class FetchContributorsCommand extends Command
 {
-
     protected const REPOSITORIES_CATEGORIES = [
         'core' => [
             'PrestaShop',
