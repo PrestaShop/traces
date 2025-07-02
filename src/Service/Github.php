@@ -19,7 +19,7 @@ class Github
      */
     protected $client;
 
-    public function __construct(string $cacheDir, ?string $ghToken = null)
+    public function __construct(string $cacheDir, ?string $ghtoken = null)
     {
         $filesystemAdapter = new Local($cacheDir);
         $filesystem = new Filesystem($filesystemAdapter);
@@ -28,8 +28,8 @@ class Github
         $this->client = new Client();
         $this->client->addCache($pool);
 
-        if (!empty($ghToken)) {
-            $this->client->authenticate($ghToken, null, Client::AUTH_ACCESS_TOKEN);
+        if (!empty($ghtoken)) {
+            $this->client->authenticate($ghtoken, null, Client::AUTH_ACCESS_TOKEN);
         }
     }
 

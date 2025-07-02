@@ -3,6 +3,7 @@
 Traces is a Symfony CLI application that is able to :
 * fetch all repositories of the PrestaShop organization
 * fetch all contributors and their contributions in "developer-readable" JSON format for a specified repository
+* fetch all merged pull requests of the PrestaShop organization
  
 ## Installation
  
@@ -14,7 +15,7 @@ The authentication use a Github Token.
  $ composer require prestashop/traces
 
  # Fetch all repositories
- $ php bin/console traces:fetch:repositories --ghToken=<ghtoken>
+ $ php bin/console traces:fetch:repositories --ghtoken=<ghtoken>
  OR
  $ GH_TOKEN=<ghtoken> php bin/console traces:fetch:repositories
  OR
@@ -23,13 +24,22 @@ The authentication use a Github Token.
  ## A file gh_repositories.json is generated
  
  # Check a repository
- $ php bin/console traces:fetch:contributors --ghToken=<ghtoken> -r <repositoryName> --config="config.yml"
+ $ php bin/console traces:fetch:contributors --ghtoken=<ghtoken> -r <repositoryName> --config="config.yml"
  OR
  $ GH_TOKEN=<ghtoken> php bin/console traces:fetch:contributors -r <repositoryName> --config="config.yml"
  OR
  * Add GH_TOKEN=<ghtoken> in .env file
  $ php bin/console traces:fetch:contributors -r <repositoryName> --config="config.yml"
  ## A file contributors.js is generated
+
+ # Fetch all merged pullrequests
+ $ php bin/console traces:fetch:pullrequests:merged --ghtoken=<ghtoken>
+ OR
+ $ GH_TOKEN=<ghtoken> php bin/console traces:fetch:pullrequests:merged
+ OR
+ * Add GH_TOKEN=<ghtoken> in .env file
+ $ php bin/console traces:fetch:pullrequests:merged
+ ## A file gh_pullrequests.json is generated
 ```
 
 ## Configuring
