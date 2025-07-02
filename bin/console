@@ -5,6 +5,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use PrestaShop\Traces\Command\FetchContributorsCommand;
 use PrestaShop\Traces\Command\FetchPullRequestsMergedCommand;
 use PrestaShop\Traces\Command\FetchRepositoriesCommand;
+use PrestaShop\Traces\Command\GenerateTopCompaniesCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Dotenv\Dotenv;
 
@@ -20,4 +21,5 @@ $app = new Application();
 $app->add(new FetchContributorsCommand());
 $app->add(new FetchPullRequestsMergedCommand());
 $app->add(new FetchRepositoriesCommand());
+$app->add(new GenerateTopCompaniesCommand());
 $app->run();

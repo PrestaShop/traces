@@ -32,7 +32,7 @@ class FetchPullRequestsMergedCommand extends AbstractCommand
         parent::execute($input, $output);
 
         if (!file_exists(self::FILE_REPOSITORIES)) {
-            $output->writeLn('gh_repositories.json is missing. Please execute `php bin/console traces:fetch:repositories`');
+            $this->output->writeLn('gh_repositories.json is missing. Please execute `php bin/console traces:fetch:repositories`');
 
             return 1;
         }
@@ -41,16 +41,16 @@ class FetchPullRequestsMergedCommand extends AbstractCommand
 
         $time = time();
 
-        $output->writeLn([count($this->orgRepositories) . ' repositories fetched.']);
+        $this->output->writeLn([count($this->orgRepositories) . ' repositories fetched.']);
 
-        $this->fetchOrgPullRequests($output);
+        $this->fetchOrgPullRequests();
 
-        $output->writeLn(['', 'Output generated in ' . (time() - $time) . 's.']);
+        $this->output->writeLn(['', 'Output generated in ' . (time() - $time) . 's.']);
 
         return 0;
     }
 
-    protected function fetchOrgPullRequests(OutputInterface $output): void
+    protected function fetchOrgPullRequests(): void
     {
       $pullRequests = [];
       if (file_exists(self::FILE_PULLREQUESTS)) {
@@ -58,7 +58,7 @@ class FetchPullRequestsMergedCommand extends AbstractCommand
       }
 
       foreach($this->orgRepositories as $repository) {
-        $output->writeLn(['', 'Repository : PrestaShop/'.$repository]);
+        $this->output->writeLn(['', 'Repository : PrestaShop/'.$repository]);
         $graphQL = 'query {
           repository(name: "'.$repository.'", owner: "PrestaShop") {
             pullRequests(first: 100, after: "%s", states:[MERGED], orderBy: {field: CREATED_AT, direction: DESC}) {
@@ -106,7 +106,7 @@ class FetchPullRequestsMergedCommand extends AbstractCommand
             'endCursor' => $data['data']['repository']['pullRequests']['pageInfo']['endCursor'],
           ]));
     
-          $output->writeLn([
+          $this->output->writeLn([
             'Repository : PrestaShop/'.$repository 
             . ' > Status: ' . $pullRequestsCount . ' / ' . $data['data']['repository']['pullRequests']['totalCount']
             .' - Total: '. count($pullRequests)]);

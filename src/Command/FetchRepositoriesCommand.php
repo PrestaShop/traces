@@ -30,7 +30,7 @@ class FetchRepositoriesCommand extends Command
 
         $repositories = $this->fetchOrgRepositories();
         file_put_contents(self::FILE_REPOSITORIES, json_encode($repositories, JSON_PRETTY_PRINT));
-        $output->writeLn([
+        $this->output->writeLn([
             count($repositories) . ' repositories fetched.',
             '',
             'Output generated in ' . (time() - $time) . 's.',

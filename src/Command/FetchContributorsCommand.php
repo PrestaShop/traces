@@ -270,7 +270,7 @@ class FetchContributorsCommand extends Command
         parent::execute($input, $output);
 
         if (!file_exists('gh_repositories.json')) {
-            $output->writeLn('gh_repositories.json is missing. Please execute `php bin/console traces:fetch:repositories`');
+            $this->output->writeLn('gh_repositories.json is missing. Please execute `php bin/console traces:fetch:repositories`');
 
             return 1;
         }
@@ -286,9 +286,9 @@ class FetchContributorsCommand extends Command
 
         $this->fetchConfiguration($input->getOption('config'));
 
-        $contributors = $this->fetchContributors($output);
+        $contributors = $this->fetchContributors();
         file_put_contents('contributors.js', json_encode($contributors, JSON_PRETTY_PRINT));
-        $output->writeLn([
+        $this->output->writeLn([
             '',
             count($contributors) . ' contributors fetched.',
             '',
@@ -315,9 +315,9 @@ class FetchContributorsCommand extends Command
      *    categories: array<string, array{total: int, repositories: array<string, int>}>
      * }>
      */
-    protected function fetchContributors(OutputInterface $output): array
+    protected function fetchContributors(): array
     {
-        $output->writeLn(sprintf('Loading contributors from %d repositories...', count($this->orgRepositories)));
+        $this->output->writeLn(sprintf('Loading contributors from %d repositories...', count($this->orgRepositories)));
 
         /**
          * @var array<string, array{
@@ -348,7 +348,7 @@ class FetchContributorsCommand extends Command
             }
         }
 
-        $progressBar = new ProgressBar($output, count($this->orgRepositories));
+        $progressBar = new ProgressBar($this->output, count($this->orgRepositories));
         $progressBar->start();
         foreach ($this->orgRepositories as $repository) {
             $section = array_reduce(array_keys(self::REPOSITORIES_CATEGORIES), function ($carry, $item) use ($repository) {
