@@ -14,7 +14,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
     protected $companyAliases = [];
 
     /**
-     * @var array<string, string>
+     * @var array<string, array<array{startDate: string, endDate: string, company: string}>>
      */
     protected $companyEmployees = [];
 
@@ -151,6 +151,9 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         return 0;
     }
 
+    /**
+     * @param array{author: array{login: string}, body: string, createdAt: string, number: int, repository: array{name: string}} $datum
+     */
     protected function extractCompany(array $datum): string
     {
         $matchCompany = '';

@@ -21,15 +21,9 @@ class AbstractCommand extends Command
 
     protected const FILE_DATA_COMPANY_EMPLOYEES = 'var/data/company_employees.json';
 
-    /**
-     * @var Github
-     */
-    protected $github;
+    protected Github $github;
 
-    /**
-     * OutputInterface
-     */
-    protected $output;
+    protected OutputInterface $output;
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
