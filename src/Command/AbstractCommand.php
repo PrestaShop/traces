@@ -15,6 +15,8 @@ class AbstractCommand extends Command
 
     protected const FILE_TOP_COMPANIES = 'topcompanies.json';
 
+    protected const FILE_NEW_CONTRIBUTORS = 'newcontributors.json';
+
     protected const FILE_GHLOGIN_WO_COMPANY = 'gh_loginsWOCompany.json';
 
     protected const FILE_DATA_COMPANY_ALIASES = 'var/data/company_aliases.json';

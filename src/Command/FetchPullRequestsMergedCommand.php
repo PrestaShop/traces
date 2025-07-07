@@ -85,6 +85,7 @@ class FetchPullRequestsMergedCommand extends AbstractCommand
                 }
                 createdAt
                 updatedAt
+                mergedAt
               }
             }
           }
