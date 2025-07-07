@@ -8,6 +8,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class GenerateTopCompaniesCommand extends AbstractCommand
 {
+    protected int $optionLimitNew = 10;
+
     /**
      * @var array<string, string>
      */
@@ -19,7 +21,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
     protected $companyEmployees = [];
 
     /**
-     * @var array<string, int>
+     * @var array<string, array{numPRs: int, lastContribution: string}>
      */
     protected $companyEmployeesWOCompany = [];
 
@@ -34,6 +36,13 @@ class GenerateTopCompaniesCommand extends AbstractCommand
                 InputOption::VALUE_OPTIONAL,
                 '',
                 $_ENV['GH_TOKEN'] ?? null
+            )
+            ->addOption(
+                'limitNew',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                '',
+                10
             );
     }
 
@@ -49,6 +58,8 @@ class GenerateTopCompaniesCommand extends AbstractCommand
 
             return 1;
         }
+
+        $this->optionLimitNew = (int) $input->getOption('limitNew');
 
         $this->companyAliases = json_decode(\file_get_contents(self::FILE_DATA_COMPANY_ALIASES), true);
         $this->companyEmployees = json_decode(\file_get_contents(self::FILE_DATA_COMPANY_EMPLOYEES), true);
@@ -130,29 +141,15 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             )
         );
 
-        $rank = 1;
-        $numLastContributions = 0;
-        foreach ($companies as $company => $numContributions) {
-            $this->output->writeLn(sprintf(
-                '%s %s (%d)',
-                $numLastContributions != $numContributions ? sprintf('#%02d', $rank) : '   ',
-                $company ?: 'Community',
-                $numContributions
-            ));
-
-            $numLastContributions = $numContributions;
-            ++$rank;
-        }
-        \file_put_contents(self::FILE_TOP_COMPANIES, json_encode($companies, JSON_PRETTY_PRINT));
-
-        arsort($this->companyEmployeesWOCompany, SORT_NUMERIC);
-        \file_put_contents(self::FILE_GHLOGIN_WO_COMPANY, json_encode($this->companyEmployeesWOCompany, JSON_PRETTY_PRINT));
+        $this->writeFileTopCompanies($companies);
+        $this->writeFileGHLoginWOCompany();
+        $this->writeFileNewContributors();
 
         return 0;
     }
 
     /**
-     * @param array{author: array{login: string}, body: string, createdAt: string, number: int, repository: array{name: string}} $datum
+     * @param array{author: array{login: string}, body: string, createdAt: string, number: int, repository: array{name: string}, mergedAt: string} $datum
      */
     protected function extractCompany(array $datum): string
     {
@@ -188,10 +185,19 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             return $this->companyAliases[$matchCompany];
         }
         if (!isset($this->companyEmployeesWOCompany[$datum['author']['login']])) {
-            $this->companyEmployeesWOCompany[$datum['author']['login']] = 0;
+            $this->companyEmployeesWOCompany[$datum['author']['login']] = [
+                'numPRs' => 0,
+                'lastContribution' => '',
+            ];
         }
 
-        ++$this->companyEmployeesWOCompany[$datum['author']['login']];
+        // Num of merged PRs
+        ++$this->companyEmployeesWOCompany[$datum['author']['login']]['numPRs'];
+        // Last merged PR
+        if (empty($this->companyEmployeesWOCompany[$datum['author']['login']]['lastContribution'])
+            || $this->companyEmployeesWOCompany[$datum['author']['login']]['lastContribution'] < $datum['mergedAt']) {
+            $this->companyEmployeesWOCompany[$datum['author']['login']]['lastContribution'] = $datum['mergedAt'];
+        }
 
         return '';
     }
@@ -215,5 +221,59 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         }
 
         return '';
+    }
+
+    /**
+     * @param array<string, int> $companies
+     */
+    protected function writeFileTopCompanies(array $companies): void
+    {
+        $rank = 1;
+        $numLastContributions = 0;
+        foreach ($companies as $company => $numContributions) {
+            $this->output->writeLn(sprintf(
+                '%s %s (%d)',
+                $numLastContributions != $numContributions ? sprintf('#%02d', $rank) : '   ',
+                $company ?: 'Community',
+                $numContributions
+            ));
+
+            $numLastContributions = $numContributions;
+            ++$rank;
+        }
+        \file_put_contents(self::FILE_TOP_COMPANIES, json_encode($companies, JSON_PRETTY_PRINT));
+    }
+
+    protected function writeFileGHLoginWOCompany(): void
+    {
+        uasort($this->companyEmployeesWOCompany, function (array $a, array $b): int {
+            if ($a['numPRs'] == $b['numPRs']) {
+                if ($a['lastContribution'] == $b['lastContribution']) {
+                    return 0;
+                }
+
+                return ($a['lastContribution'] < $b['lastContribution']) ? -1 : 1;
+            }
+
+            return ($a['numPRs'] < $b['numPRs']) ? 1 : -1;
+        });
+        \file_put_contents(self::FILE_GHLOGIN_WO_COMPANY, json_encode($this->companyEmployeesWOCompany, JSON_PRETTY_PRINT));
+    }
+
+    protected function writeFileNewContributors(): void
+    {
+        $lastNewContributors = array_slice(
+            $this->companyEmployeesWOCompany,
+            $this->optionLimitNew * -1,
+            $this->optionLimitNew,
+            true
+        );
+        $lastNewContributors = array_reverse($lastNewContributors, true);
+
+        $newcontributors = [];
+        foreach ($lastNewContributors as $ghLogin => $lastNewContributor) {
+            $newcontributors[$ghLogin] = $lastNewContributor['lastContribution'];
+        }
+        \file_put_contents(self::FILE_NEW_CONTRIBUTORS, json_encode($newcontributors, JSON_PRETTY_PRINT));
     }
 }
