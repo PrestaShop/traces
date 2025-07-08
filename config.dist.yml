@@ -22,5 +22,6 @@ config:
     - devops-prestashop
     - gitbook-bot
     - ps-jarvis
+    - github-actions
     - github-actions[bot]
     - prestonBot
