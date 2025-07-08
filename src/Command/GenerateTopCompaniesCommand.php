@@ -282,4 +282,18 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         }
         \file_put_contents(self::FILE_NEW_CONTRIBUTORS, json_encode($newcontributors, JSON_PRETTY_PRINT));
     }
+
+    protected function fetchConfiguration(string $file): void
+    {
+        if (empty($file)) {
+            return;
+        }
+        if (!file_exists($file) || !is_readable($file)) {
+            throw new RuntimeException(sprintf('File "%s" doesn\'t exist or is not readable', $file));
+        }
+        $config = Yaml::parse(file_get_contents($file) ?: '')['config'] ?? [];
+
+        $this->configExclusions = $config['exclusions'] ?? [];
+        $this->configKeepExcludedUsers = $config['keepExcludedUsers'] ?? false;
+    }
 }
