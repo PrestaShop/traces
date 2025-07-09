@@ -51,7 +51,8 @@ class GenerateTopCompaniesCommand extends AbstractCommand
                 InputOption::VALUE_OPTIONAL,
                 '',
                 10
-            );
+            )
+            ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, '', 'config.dist.yml');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

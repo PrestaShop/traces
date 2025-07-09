@@ -23,8 +23,7 @@ class FetchPullRequestsMergedCommand extends AbstractCommand
                 InputOption::VALUE_OPTIONAL,
                 '',
                 $_ENV['GH_TOKEN'] ?? null
-            )
-            ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, '', 'config.dist.yml');
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
