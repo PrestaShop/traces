@@ -10,8 +10,6 @@ use Symfony\Component\Yaml\Yaml;
 
 class GenerateTopCompaniesCommand extends AbstractCommand
 {
-    protected int $optionLimitNew = 10;
-
     /**
      * @var array<string, string>
      */
@@ -45,13 +43,6 @@ class GenerateTopCompaniesCommand extends AbstractCommand
                 '',
                 $_ENV['GH_TOKEN'] ?? null
             )
-            ->addOption(
-                'limitNew',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                '',
-                10
-            )
             ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, '', 'config.dist.yml');
     }
 
@@ -67,8 +58,6 @@ class GenerateTopCompaniesCommand extends AbstractCommand
 
             return 1;
         }
-
-        $this->optionLimitNew = (int) $input->getOption('limitNew');
 
         $this->companyAliases = json_decode(\file_get_contents(self::FILE_DATA_COMPANY_ALIASES), true);
         $this->companyEmployees = json_decode(\file_get_contents(self::FILE_DATA_COMPANY_EMPLOYEES), true);
@@ -150,7 +139,6 @@ class GenerateTopCompaniesCommand extends AbstractCommand
 
         $this->writeFileTopCompanies($companies);
         $this->writeFileGHLoginWOCompany();
-        $this->writeFileNewContributors();
 
         return 0;
     }
@@ -265,23 +253,6 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             return ($a['numPRs'] < $b['numPRs']) ? 1 : -1;
         });
         \file_put_contents(self::FILE_GHLOGIN_WO_COMPANY, json_encode($this->companyEmployeesWOCompany, JSON_PRETTY_PRINT));
-    }
-
-    protected function writeFileNewContributors(): void
-    {
-        $lastNewContributors = array_slice(
-            $this->companyEmployeesWOCompany,
-            $this->optionLimitNew * -1,
-            $this->optionLimitNew,
-            true
-        );
-        $lastNewContributors = array_reverse($lastNewContributors, true);
-
-        $newcontributors = [];
-        foreach ($lastNewContributors as $ghLogin => $lastNewContributor) {
-            $newcontributors[$ghLogin] = $lastNewContributor['lastContribution'];
-        }
-        \file_put_contents(self::FILE_NEW_CONTRIBUTORS, json_encode($newcontributors, JSON_PRETTY_PRINT));
     }
 
     protected function fetchConfiguration(string $file): void

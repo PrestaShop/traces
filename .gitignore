@@ -11,6 +11,7 @@ config.yml
 
 # Generated files
 contributors.js
+contributors.json
 gh_loginsWOCompany.json
 gh_pullrequests.json
 gh_repositories.json

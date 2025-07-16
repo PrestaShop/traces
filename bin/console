@@ -1,10 +1,11 @@
 #!/usr/bin/env php
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
- 
+
 use PrestaShop\Traces\Command\FetchContributorsCommand;
 use PrestaShop\Traces\Command\FetchPullRequestsMergedCommand;
 use PrestaShop\Traces\Command\FetchRepositoriesCommand;
+use PrestaShop\Traces\Command\GenerateNewContributorsCommand;
 use PrestaShop\Traces\Command\GenerateTopCompaniesCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Dotenv\Dotenv;
@@ -16,10 +17,11 @@ if (file_exists(__DIR__.'/../.env')) {
     $dotenv = new Dotenv();
     $dotenv->load(__DIR__.'/../.env');
 }
- 
+
 $app = new Application();
 $app->add(new FetchContributorsCommand());
 $app->add(new FetchPullRequestsMergedCommand());
 $app->add(new FetchRepositoriesCommand());
+$app->add(new GenerateNewContributorsCommand());
 $app->add(new GenerateTopCompaniesCommand());
 $app->run();

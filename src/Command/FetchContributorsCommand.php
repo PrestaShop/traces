@@ -279,13 +279,17 @@ class FetchContributorsCommand extends AbstractCommand
         } else {
             $this->orgRepositories = json_decode(file_get_contents('gh_repositories.json') ?: '', true);
         }
+        $this->output->writeLn('Fetching contributors data for these repositories: ' . implode(', ', $this->orgRepositories));
 
         $time = time();
 
         $this->fetchConfiguration($input->getOption('config'));
 
         $contributors = $this->fetchContributors();
-        file_put_contents('contributors.js', json_encode($contributors, JSON_PRETTY_PRINT));
+        // Keep contributors.js for backward compatibility with the old page, but could be removed when no longer used
+        file_put_contents(self::FILE_CONTRIBUTORS, json_encode($contributors, JSON_PRETTY_PRINT));
+
+        file_put_contents(self::FILE_CONTRIBUTORS_LEGACY, json_encode($contributors, JSON_PRETTY_PRINT));
         $this->output->writeLn([
             '',
             count($contributors) . ' contributors fetched.',
@@ -410,7 +414,8 @@ class FetchContributorsCommand extends AbstractCommand
             }
         }
 
-        usort($users, function (array $userA, array $userB): int {
+        // Use uasort to keep the initial key matching the login, but still order the list by contributions
+        uasort($users, function (array $userA, array $userB): int {
             if ($userA['contributions'] == $userB['contributions']) {
                 return 0;
             }
