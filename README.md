@@ -33,9 +33,13 @@ The authentication use a Github Token.
  $ php bin/console traces:fetch:pullrequests:merged
  ## A file gh_pullrequests.json is generated
 
- # 4- Fetch top companies
- $ php bin/console traces:generate:topcompanies
- ## Files topcompanies.json, newcontributors.json and gh_loginsWOCompany.json are generated
+ # 4- Fetch new contributors
+ $ php bin/console traces:generate:newcontributors --config="config.yml"
+ ## A file newcontributors.json is generated
+
+ # 5- Fetch top companies
+ $ php bin/console traces:generate:topcompanies --config="config.yml"
+ ## Files topcompanies.json and gh_loginsWOCompany.json are generated
 ```
 
 ## Configuring

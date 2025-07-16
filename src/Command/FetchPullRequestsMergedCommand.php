@@ -104,7 +104,7 @@ class FetchPullRequestsMergedCommand extends AbstractCommand
                 file_put_contents(self::FILE_PULLREQUESTS, json_encode([
                     'pullRequests' => $pullRequests,
                     'endCursor' => $data['data']['repository']['pullRequests']['pageInfo']['endCursor'],
-                ]));
+                ], JSON_PRETTY_PRINT));
 
                 $this->output->writeLn([
                     'Repository : PrestaShop/' . $repository
