@@ -5,41 +5,37 @@ Traces is a Symfony CLI application that is able to :
 * fetch all contributors and their contributions in "developer-readable" JSON format for a specified repository
 * fetch all merged pull requests of the PrestaShop organization
  
-## Installation
+## Installation / usage
  
 The authentication use a Github Token.
 
 > Note: You can fetch here : https://github.com/settings/tokens/new?description=traces&scopes=repo,read:org
  
 ```bash
- $ composer require prestashop/traces
+ $ composer create-project prestashop/traces
+```
 
- # Fetch all repositories
- $ php bin/console traces:fetch:repositories --ghtoken=<ghtoken>
- OR
- $ GH_TOKEN=<ghtoken> php bin/console traces:fetch:repositories
- OR
- * Add GH_TOKEN=<ghtoken> in .env file
+ All the following commands require a Github token to access and use Github APIs, you have three ways to define this token:
+ - using the command option: `--ghtoken=<ghtoken>`
+ - using an environment variable: GH_TOKEN=<ghtoken> php bin/console <command>`
+ - using .env file and adding GH_TOKEN=<ghtoken>
+
+```bash
+ # 1- Fetch all repositories
  $ php bin/console traces:fetch:repositories
  ## A file gh_repositories.json is generated
  
- # Check a repository
- $ php bin/console traces:fetch:contributors --ghtoken=<ghtoken> -r <repositoryName> --config="config.yml"
- OR
- $ GH_TOKEN=<ghtoken> php bin/console traces:fetch:contributors -r <repositoryName> --config="config.yml"
- OR
- * Add GH_TOKEN=<ghtoken> in .env file
+ # 2- Check a repository (the repository option is optional and will then fetch ALL repositories from gh_repositories.json)
  $ php bin/console traces:fetch:contributors -r <repositoryName> --config="config.yml"
  ## A file contributors.json is generated
 
- # Fetch all merged pullrequests
- $ php bin/console traces:fetch:pullrequests:merged --ghtoken=<ghtoken>
- OR
- $ GH_TOKEN=<ghtoken> php bin/console traces:fetch:pullrequests:merged
- OR
- * Add GH_TOKEN=<ghtoken> in .env file
+ # 3- Fetch all merged pullrequests
  $ php bin/console traces:fetch:pullrequests:merged
  ## A file gh_pullrequests.json is generated
+
+ # 4- Fetch top companies
+ $ php bin/console traces:generate:topcompanies
+ ## Files topcompanies.json, newcontributors.json and gh_loginsWOCompany.json are generated
 ```
 
 ## Configuring
