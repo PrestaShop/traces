@@ -30,7 +30,7 @@ The authentication use a Github Token.
  OR
  * Add GH_TOKEN=<ghtoken> in .env file
  $ php bin/console traces:fetch:contributors -r <repositoryName> --config="config.yml"
- ## A file contributors.js is generated
+ ## A file contributors.json is generated
 
  # Fetch all merged pullrequests
  $ php bin/console traces:fetch:pullrequests:merged --ghtoken=<ghtoken>
