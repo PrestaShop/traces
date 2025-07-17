@@ -2,6 +2,10 @@
 
 namespace PrestaShop\Traces\Command;
 
+use DateTimeImmutable;
+use PrestaShop\Traces\DTO\Company;
+use PrestaShop\Traces\DTO\Employee;
+use PrestaShop\Traces\DTO\TimeFrame;
 use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,14 +15,9 @@ use Symfony\Component\Yaml\Yaml;
 class GenerateTopCompaniesCommand extends AbstractCommand
 {
     /**
-     * @var array<string, string>
+     * @var Company[]
      */
-    protected $companyAliases = [];
-
-    /**
-     * @var array<string, array<array{startDate: string, endDate: string, company: string}>>
-     */
-    protected $companyEmployees = [];
+    protected $companies = [];
 
     /**
      * @var array<string, array{numPRs: int, lastContribution: string}>
@@ -30,6 +29,13 @@ class GenerateTopCompaniesCommand extends AbstractCommand
      */
     protected array $configExclusions = [];
     protected bool $configKeepExcludedUsers = false;
+
+    /**
+     * Keep record of unknown sponsor companies.
+     *
+     * @var array<string, int>
+     */
+    protected array $unknownSponsorCompanies = [];
 
     protected function configure()
     {
@@ -59,8 +65,33 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             return 1;
         }
 
-        $this->companyAliases = json_decode(\file_get_contents(self::FILE_DATA_COMPANY_ALIASES), true);
-        $this->companyEmployees = json_decode(\file_get_contents(self::FILE_DATA_COMPANY_EMPLOYEES), true);
+        $companiesData = json_decode(\file_get_contents(self::FILE_DATA_COMPANIES), true);
+        foreach ($companiesData as $companyData) {
+            $employees = [];
+            if (!empty($companyData['employees'])) {
+                foreach ($companyData['employees'] as $employeeLogin => $employeeTimeFrames) {
+                    $timeFrames = [];
+                    foreach ($employeeTimeFrames as $timeFrame) {
+                        $timeFrames[] = new TimeFrame(
+                            new DateTimeImmutable($timeFrame['startDate']),
+                            !empty($timeFrame['endDate']) ? new DateTimeImmutable($timeFrame['endDate']) : null);
+                    }
+
+                    $employees[] = new Employee(
+                        $employeeLogin,
+                        $timeFrames,
+                    );
+                }
+            }
+
+            $this->companies[] = new Company(
+                $companyData['name'],
+                $companyData['aliases'] ?? [],
+                $employees,
+                $companyData['avatar_url'] ?? '',
+                $companyData['html_url'] ?? '',
+            );
+        }
 
         $data = json_decode(file_get_contents(self::FILE_PULLREQUESTS), true);
         $data = $data['pullRequests'];
@@ -75,7 +106,17 @@ class GenerateTopCompaniesCommand extends AbstractCommand
 
         // Clean PR Listing
         $numPRRemoved = 0;
-        $companies = [];
+        foreach ($this->companies as $company) {
+            if ($company->name === 'Open Source Community') {
+                $community = $company;
+                break;
+            }
+        }
+
+        if (!isset($community)) {
+            throw new RuntimeException('Could not find community company');
+        }
+
         foreach ($data as $key => $datum) {
             // Is the PR is not merged ?
             if ($datum['state'] !== 'MERGED') {
@@ -94,11 +135,13 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             }
 
             $company = $this->extractCompany($datum);
-            if (!isset($companies[$company])) {
-                $companies[$company] = 0;
+            if ($company) {
+                ++$company->associatedPullRequests;
+            } else {
+                ++$community->associatedPullRequests;
             }
-            ++$companies[$company];
         }
+
         $this->output->writeLn([
             sprintf(
                 '=== Data : %d PRs removed (PR Not in Status = Merged || PR has no Author || PR has a Bot Author)',
@@ -107,37 +150,44 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             '',
         ]);
 
-        uksort($companies, function ($a, $b) use ($companies) {
-            if ($companies[$a] == $companies[$b]) {
-                if ($a == $b) {
-                    return 0;
-                }
+        // Sort by number of associated PRs filter the companies that didn't contribute any
+        usort($this->companies, function (Company $a, Company $b) {
+            return $b->associatedPullRequests - $a->associatedPullRequests;
+        });
+        $rankedCompanies = array_filter($this->companies, function (Company $company) {
+            return $company->associatedPullRequests > 0;
+        });
 
-                return ($a < $b) ? -1 : 1;
+        $rank = 0;
+        $lastScore = null;
+        foreach ($rankedCompanies as $company) {
+            if ($lastScore === null || $lastScore !== $company->associatedPullRequests) {
+                ++$rank;
             }
 
-            return ($companies[$a] < $companies[$b]) ? 1 : -1;
-        });
+            $company->rank = $rank;
+            $lastScore = $company->associatedPullRequests;
+        }
 
         // Company contributors
         $sumContributions = 0;
-        foreach ($companies as $company => $numContributions) {
-            if ($company == '') {
-                continue;
+        foreach ($rankedCompanies as $company) {
+            if ($company !== $community) {
+                $sumContributions += $company->associatedPullRequests;
             }
-            $sumContributions += $numContributions;
         }
 
         $this->output->writeLn(
             sprintf(
                 '=== Company contributors (Sponsor Company & Linked employees) (%d contributions for %d companies + %d from Community):',
                 $sumContributions,
-                count($companies) - 1,
-                $companies['']
+                count($rankedCompanies),
+                $community->associatedPullRequests
             )
         );
 
-        $this->writeFileTopCompanies($companies);
+        $this->displayCompaniesNotFound();
+        $this->writeFileTopCompanies($rankedCompanies);
         $this->writeFileGHLoginWOCompany();
 
         return 0;
@@ -146,19 +196,18 @@ class GenerateTopCompaniesCommand extends AbstractCommand
     /**
      * @param array{author: array{login: string}, body: string, createdAt: string, number: int, repository: array{name: string}, mergedAt: string} $datum
      */
-    protected function extractCompany(array $datum): string
+    protected function extractCompany(array $datum): ?Company
     {
         $matchCompany = '';
 
         // Extract company from "Sponsor Company"
         if (preg_match('/\|\h+Sponsor company\h+\|\h+([^\r\n]+)/mu', $datum['body'], $matches)) {
-            $matchCompany = trim($matches[1]);
+            $matchCompany = strtolower(trim($matches[1]));
         }
         if (!empty($matchCompany)) {
-            if (array_key_exists($matchCompany, $this->companyAliases)) {
-                if (!empty($this->companyAliases[$matchCompany])) {
-                    return $this->companyAliases[$matchCompany];
-                }
+            $company = $this->getCompanyByAlias($matchCompany);
+            if ($company) {
+                return $company;
             } else {
                 $this->output->writeln(
                     'Sponsor Company Not Found : '
@@ -167,18 +216,22 @@ class GenerateTopCompaniesCommand extends AbstractCommand
                     . ' => ' . $datum['author']['login']
                     . '/' . $matchCompany
                 );
+                if (!isset($this->unknownSponsorCompanies[$matchCompany])) {
+                    $this->unknownSponsorCompanies[$matchCompany] = 0;
+                }
+                ++$this->unknownSponsorCompanies[$matchCompany];
 
-                return '';
+                return null;
             }
         }
 
         // Extract company from "Author"
-        $matchCompany = $this->extractCompanyFromAuthor($datum['author']['login'], $datum['createdAt']);
-        $matchCompany = trim($matchCompany);
-
-        if (!empty($matchCompany) && array_key_exists($matchCompany, $this->companyAliases)) {
-            return $this->companyAliases[$matchCompany];
+        $authorCompany = $this->extractCompanyFromAuthor($datum['author']['login'], $datum['createdAt']);
+        if ($authorCompany) {
+            return $authorCompany;
         }
+
+        // No company found so we store the author as an employee without Company
         if (!isset($this->companyEmployeesWOCompany[$datum['author']['login']])) {
             $this->companyEmployeesWOCompany[$datum['author']['login']] = [
                 'numPRs' => 0,
@@ -194,49 +247,96 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             $this->companyEmployeesWOCompany[$datum['author']['login']]['lastContribution'] = $datum['mergedAt'];
         }
 
-        return '';
+        return null;
     }
 
-    protected function extractCompanyFromAuthor(string $login, string $createdAt): string
+    protected function extractCompanyFromAuthor(string $login, string $createdAt): ?Company
     {
-        if (!isset($this->companyEmployees[$login])) {
-            return '';
-        }
+        $createdAt = new DateTimeImmutable($createdAt);
 
-        $timeframes = $this->companyEmployees[$login];
+        foreach ($this->companies as $company) {
+            if (empty($company->employees)) {
+                continue;
+            }
 
-        $createdAt = date('Y-m-d', strtotime($createdAt));
-        foreach ($timeframes as $timeframe) {
-            $timeframeStart = date('Y-m-d', strtotime($timeframe['startDate']));
-            $timeframeEnd = date('Y-m-d', strtotime($timeframe['endDate'] ?: 'now'));
-
-            if (($createdAt >= $timeframeStart) && ($createdAt <= $timeframeEnd)) {
-                return $timeframe['company'];
+            foreach ($company->employees as $employee) {
+                if ($employee->login == $login) {
+                    foreach ($employee->timeFrames as $timeframe) {
+                        if ($createdAt >= $timeframe->startTime && ($timeframe->endTime === null || $createdAt <= $timeframe->endTime)) {
+                            return $company;
+                        }
+                    }
+                }
             }
         }
 
-        return '';
+        return null;
+    }
+
+    protected function getCompanyByAlias(string $alias): ?Company
+    {
+        $trimmedAlias = trim(strtolower($alias));
+        foreach ($this->companies as $company) {
+            if (trim(strtolower($company->name)) === $trimmedAlias) {
+                return $company;
+            }
+
+            foreach ($company->aliases as $companyAlias) {
+                if (trim(strtolower($companyAlias)) === $trimmedAlias) {
+                    return $company;
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
-     * @param array<string, int> $companies
+     * Display unknown sponsor companies to see if they are worth being added in the
+     * list of companies (under three PRs no real interest).
+     *
+     * @return void
      */
-    protected function writeFileTopCompanies(array $companies): void
+    protected function displayCompaniesNotFound(): void
     {
-        $rank = 1;
+        $this->output->writeLn('There are unknown sponsor companies');
+        // Sort ascending to show the more interesting ones last
+        uasort($this->unknownSponsorCompanies, function (int $prNbA, int $prNbB) {
+            return $prNbA - $prNbB;
+        });
+
+        foreach ($this->unknownSponsorCompanies as $company => $numberOfPrs) {
+            $this->output->writeLn(sprintf(
+                '%s (%d)',
+                $company,
+                $numberOfPrs
+            ));
+        }
+        $this->output->writeLn('');
+    }
+
+    /**
+     * @param Company[] $rankedCompanies
+     *
+     * @return void
+     */
+    protected function writeFileTopCompanies(array $rankedCompanies): void
+    {
         $numLastContributions = 0;
-        foreach ($companies as $company => $numContributions) {
+        foreach ($rankedCompanies as $company) {
             $this->output->writeLn(sprintf(
                 '%s %s (%d)',
-                $numLastContributions != $numContributions ? sprintf('#%02d', $rank) : '   ',
-                $company ?: 'Community',
-                $numContributions
+                $numLastContributions != $company->associatedPullRequests ? sprintf('#%02d', $company->rank) : '   ',
+                $company->name,
+                $company->associatedPullRequests
             ));
 
-            $numLastContributions = $numContributions;
-            ++$rank;
+            $numLastContributions = $company->associatedPullRequests;
         }
-        \file_put_contents(self::FILE_TOP_COMPANIES, json_encode($companies, JSON_PRETTY_PRINT));
+
+        \file_put_contents(self::FILE_TOP_COMPANIES, json_encode(array_map(function (Company $company) {
+            return $company->toArray();
+        }, $rankedCompanies), JSON_PRETTY_PRINT));
     }
 
     protected function writeFileGHLoginWOCompany(): void
