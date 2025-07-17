@@ -1,0 +1,220 @@
+[
+  {
+    "name": "Open Source Community",
+    "html_url": "https://www.prestashop-project.org",
+    "aliases": [
+      "/",
+      "-",
+      "--",
+      "~",
+      "Acme Company",
+      "Me :).",
+      "Myself",
+      "NA",
+      "N/A",
+      "n/a",
+      "Not applicable",
+      "No",
+      "no",
+      "none",
+      "Your company or customer's name goes here (if applicable).",
+      "[Your company name, if applicable]",
+      "Applied in Dolibarr (not specifically sponsor company)."
+    ]
+  },
+  {
+    "name": "PrestaShop",
+    "html_url": "https://www.prestashop.com",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2815696?s=200&v=4",
+    "aliases": [
+      "MBO",
+      "@Prestashop",
+      "@PrestaShop",
+      "@PrestaSopCorp",
+      "@PrestaSHopCorp",
+      "@Prestashopcorp",
+      "@PrestashopCorp",
+      "@PrestaShopCorp",
+      "@PrestaShopCorps",
+      "@prestaShopCorps",
+      "@Prestashop Corp.",
+      "@PrestashopCorp.",
+      "@prestashopCorp",
+      "@PrestaSHopCore",
+      "@prestashopCore",
+      "@prestashopcore",
+      "@PrestashopCore",
+      "@PrestaShopCore",
+      "[@PrestaShopCorp](https://github.com/PrestaShopCorp)",
+      "[@PrestashopCorp](https://github.com/PrestaShopCorp)",
+      "https://github.com/PrestaShopCorp",
+      "PretsaShop",
+      "Prestashop",
+      "PrestaShop",
+      "PrestaShopSA",
+      "Prestasop SA",
+      "Prestashop SA",
+      "PrestaShop SA.",
+      "PrestashopSA",
+      "PrestaShop SA",
+      "PrestashopCore",
+      "PrestaShopCore",
+      "PretsaShopCorp",
+      "PrestaShopCorp",
+      "PrestaShop Corp",
+      "PrestaShop Corp.",
+      "PrestaShop Core",
+      "Prestashop Core",
+      "PS",
+      "PrestaShop, ps_accounts, ps_eventbus.",
+      "PrestaShop Account",
+      "PrestaShop CloudSync",
+      "Compliance team",
+      "CloudSync team.",
+      "The awesome Core team",
+      "The Core team",
+      "Alexis' team",
+      "PrestaShop (@thymotep)",
+      "Mikatux corp"
+    ],
+    "employees": {
+      "jolelievre": [
+        {
+          "startDate": "2018-08-01",
+          "endDate": ""
+        }
+      ],
+      "Progi1984": [
+        {
+          "startDate": "2019-07-01",
+          "endDate": ""
+        }
+      ]
+    }
+  },
+  {
+    "name": "202 ecommerce",
+    "html_url": "https://www.202-ecommerce.com/",
+    "aliases": [
+      "@202ecommerce",
+      "@202-ecommerce",
+      "202ecommerce",
+      "202 ecommerce",
+      "202 ecommerce |"
+    ]
+  },
+  {
+    "name": "Codencode",
+    "html_url": "https://www.codencode.it/",
+    "aliases": [
+      "@Codencode"
+    ]
+  },
+  {
+    "name": "Creabilis",
+    "html_url": "https://www.creabilis.com/",
+    "aliases": [
+      "@Creabilis",
+      "Creabilis.",
+      "Creabilis.com"
+    ]
+  },
+  {
+    "name": "Evolutive",
+    "html_url": "https://www.evolutive.com/",
+    "aliases": [
+      "Evolutive Group"
+    ]
+  },
+  {
+    "name": "Fintecture",
+    "html_url": "https://www.fintecture.com/"
+  },
+  {
+    "name": "Friends of Presta",
+    "html_url": "https://friendsofpresta.org/",
+    "aliases": [
+      "@friends-of-presta",
+      "FOP"
+    ]
+  },
+  {
+    "name": "Head Issue",
+    "html_url": "https://www.headissue.com/",
+    "aliases": [
+      "headissue GmbH"
+    ]
+  },
+  {
+    "name": "Idnovate",
+    "html_url": "idnovate.com",
+    "aliases": [
+      "idnovate.com"
+    ]
+  },
+  {
+    "name": "OpenServis",
+    "html_url": "https://www.openservis.cz/",
+    "aliases": [
+      "https://www.openservis.cz/"
+    ]
+  },
+  {
+    "name": "Trendo",
+    "html_url": "https://www.trendo.cz/",
+    "aliases": [
+      "[TRENDO s.r.o.](https://www.trendo.cz)",
+      "[TRENDO s.r.o.](https://www.trendo.cz/)",
+      "TRENDO s.r.o."
+    ]
+  },
+  {
+    "name": "Franck Lefèvre",
+    "html_url": "https://lefevre.dev/",
+    "aliases": [
+      "lefevre.dev"
+    ]
+  },
+  {
+    "name": "PrestaWorks",
+    "html_url": "https://www.prestaworks.se/",
+    "aliases": [
+      "Prestaworks AB"
+    ]
+  },
+  {
+    "name": "Société Biblique de Genève",
+    "html_url": "https://societebiblique.com",
+    "aliases": [
+      "Société Bilique de Genève"
+    ]
+  },
+  {
+    "name": "Wepika",
+    "html_url": "https://www.wepika.com/",
+    "aliases": [
+      "@Wepika",
+      "@Wepika."
+    ]
+  },
+  {
+    "name": "Kiwik",
+    "html_url": "https://www.kiwik.com/",
+    "aliases": [
+      "Studio Kiwik",
+      "KIWIK (kiwik.com)"
+    ]
+  },
+  {
+    "name": "Krystian Podemski",
+    "html_url": "https://podemski.dev/",
+    "aliases": [
+      "Mr Podemsky Corp",
+      "Krystian Podemski"
+    ]
+  },
+  {
+    "name": "Profileo",
+    "html_url": "https://www.profileo.com/"
+  }
+]

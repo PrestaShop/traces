@@ -11,7 +11,6 @@ class AbstractCommand extends Command
 {
     protected const FILE_CONTRIBUTORS = 'contributors.json';
 
-    protected const FILE_CONTRIBUTORS_LEGACY = 'contributors.js';
     protected const FILE_PULLREQUESTS = 'gh_pullrequests.json';
 
     protected const FILE_REPOSITORIES = 'gh_repositories.json';
@@ -21,10 +20,7 @@ class AbstractCommand extends Command
     protected const FILE_NEW_CONTRIBUTORS = 'newcontributors.json';
 
     protected const FILE_GHLOGIN_WO_COMPANY = 'gh_loginsWOCompany.json';
-
-    protected const FILE_DATA_COMPANY_ALIASES = 'var/data/company_aliases.json';
-
-    protected const FILE_DATA_COMPANY_EMPLOYEES = 'var/data/company_employees.json';
+    protected const FILE_DATA_COMPANIES = 'var/data/companies.json';
 
     protected Github $github;
 
