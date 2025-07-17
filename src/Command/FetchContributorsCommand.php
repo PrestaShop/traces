@@ -286,10 +286,8 @@ class FetchContributorsCommand extends AbstractCommand
         $this->fetchConfiguration($input->getOption('config'));
 
         $contributors = $this->fetchContributors();
-        // Keep contributors.js for backward compatibility with the old page, but could be removed when no longer used
         file_put_contents(self::FILE_CONTRIBUTORS, json_encode($contributors, JSON_PRETTY_PRINT));
 
-        file_put_contents(self::FILE_CONTRIBUTORS_LEGACY, json_encode($contributors, JSON_PRETTY_PRINT));
         $this->output->writeLn([
             '',
             count($contributors) . ' contributors fetched.',

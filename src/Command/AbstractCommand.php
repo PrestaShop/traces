@@ -11,7 +11,6 @@ class AbstractCommand extends Command
 {
     protected const FILE_CONTRIBUTORS = 'contributors.json';
 
-    protected const FILE_CONTRIBUTORS_LEGACY = 'contributors.js';
     protected const FILE_PULLREQUESTS = 'gh_pullrequests.json';
 
     protected const FILE_REPOSITORIES = 'gh_repositories.json';
