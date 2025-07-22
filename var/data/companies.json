@@ -78,6 +78,12 @@
       "Mikatux corp"
     ],
     "employees": {
+      "boherm": [
+        {
+          "startDate": "2023-03-06",
+          "endDate": ""
+        }
+      ],
       "jolelievre": [
         {
           "startDate": "2018-08-01",
@@ -96,27 +102,9 @@
           "endDate": ""
         }
       ],
-      "Progi1984": [
-        {
-          "startDate": "2019-07-01",
-          "endDate": ""
-        }
-      ],
-      "boherm": [
-        {
-          "startDate": "2023-03-06",
-          "endDate": ""
-        }
-      ],
       "nesrineabdmouleh": [
         {
           "startDate": "2021-10-04",
-          "endDate": ""
-        }
-      ],
-      "Quetzacoalt91": [
-        {
-          "startDate": "2014-02-24",
           "endDate": ""
         }
       ],
@@ -125,12 +113,24 @@
           "startDate": "2022-09-05",
           "endDate": ""
         }
+      ],
+      "Progi1984": [
+        {
+          "startDate": "2019-07-01",
+          "endDate": ""
+        }
+      ],
+      "Quetzacoalt91": [
+        {
+          "startDate": "2014-02-24",
+          "endDate": ""
+        }
       ]
     }
   },
   {
     "name": "202 ecommerce",
-    "html_url": "https://www.202-ecommerce.com/",
+    "html_url": "https://www.202-ecommerce.com",
     "aliases": [
       "@202ecommerce",
       "@202-ecommerce",
@@ -140,10 +140,95 @@
     ]
   },
   {
+    "name": "AD-Dev",
+    "html_url": "https://www.ad-dev.be",
+    "aliases": [
+      "ad-dev srl"
+    ]
+  },
+  {
+    "name": "Adilis",
+    "html_url": "https://www.adilis.fr",
+    "aliases": [
+      "adilis"
+    ]
+  },
+  {
+    "name": "Aérographe Discount",
+    "html_url": "https://www.aerographediscount.fr",
+    "aliases": [
+      "aerographediscount"
+    ]
+  },
+  {
+    "name": "AGRO-LA",
+    "html_url": "https://agrola.cz",
+    "aliases": [
+      "[agro-la]( https://eshop.agrola.cz/)"
+    ]
+  },
+  {
+    "name": "Arkonsoft",
+    "html_url": "https://arkonsoft.pl",
+    "aliases":[
+      "arkonsoft"
+    ]
+  },
+  {
+    "name": "Avalanche Media",
+    "html_url": "https://avalanchemedia.cz",
+    "aliases": [
+      "@avalanchemedia"
+    ]
+  },
+  {
+    "name": "Bakhouche Akram",
+    "html_url": "https://bak-dev.com",
+    "aliases": [
+      "bakhouche akram"
+    ]
+  },
+  {
+    "name": "BM Services",
+    "html_url": "https://www.bm-services.com",
+    "aliases": [
+      "bm services"
+    ]
+  },
+  {
+    "name": "Borja García",
+    "html_url": "https://boki.es",
+    "aliases": [
+      "boki.es"
+    ]
+  },
+  {
     "name": "Codencode",
-    "html_url": "https://www.codencode.it/",
+    "html_url": "https://www.codencode.it",
     "aliases": [
       "@Codencode"
+    ]
+  },
+  {
+    "name": "Com'onSoft",
+    "html_url": "https://www.comonsoft.com",
+    "aliases": [
+      "@comonsoft"
+    ]
+  },
+  {
+    "name": "Code Olympus Studio",
+    "html_url": "https://codeolympus.studio",
+    "aliases": [
+      "code olympus",
+      "code olympus studio"
+    ]
+  },
+  {
+    "name":"Coquille Consulting",
+    "html_url": "https://coquille.fr",
+    "aliases": [
+      "coquille.fr"
     ]
   },
   {
@@ -154,7 +239,7 @@
       "@Creabilis",
       "Creabilis.",
       "Creabilis.com"
-    ]
+    ],
     "employees": {
       "jf-viguier": [
         {
@@ -167,8 +252,36 @@
           "startDate": "2021-10-01",
           "endDate": ""
         }
-      ],
-    },
+      ]
+    }
+  },
+  {
+    "name": "Cubix Tech",
+    "html_url": "https://www.cubixtech.in",
+    "aliases": [
+      "cubix tech"
+    ]
+  },
+  {
+    "name": "Daniel Hlaváček",
+    "html_url": "https://danielhlavacek.cz",
+    "aliases": [
+      "www.danielhlavacek.cz"
+    ]
+  },
+  {
+    "name": "ECM",
+    "html_url": "https://www.ecommerce-manager.it",
+    "aliases": [
+      "ecommerce-manager.it"
+    ]
+  },
+  {
+    "name": "eflyshop",
+    "html_url": "https://www.eflyshop.com.ar",
+    "aliases": [
+      "eflyshop"
+    ]
   },
   {
     "name": "Evolutive",
@@ -182,11 +295,33 @@
     "html_url": "https://www.fintecture.com/"
   },
   {
+    "name": "Franck Lefèvre",
+    "html_url": "https://lefevre.dev/",
+    "avatar_url": "https://lefevre.dev/progi1984.png",
+    "aliases": [
+      "lefevre.dev"
+    ]
+  },
+  {
     "name": "Friends of Presta",
     "html_url": "https://friendsofpresta.org/",
     "aliases": [
       "@friends-of-presta",
       "FOP"
+    ]
+  },
+  {
+    "name": "Griiv",
+    "html_url": "https://griiv.fr",
+    "aliases": [
+      "griiv"
+    ]
+  },
+  {
+    "name": "Habitium",
+    "html_url": "https://habitium.com",
+    "aliases": [
+      "habitium"
     ]
   },
   {
@@ -197,6 +332,14 @@
     ]
   },
   {
+    "name": "Hostinato",
+    "html_url": "https://www.hostinato.it",
+    "aliases": [
+      "[www.hostinato.it](http://www.hostinato.it/)",
+      "www.hostinato.it"
+    ]
+  },
+  {
     "name": "Idnovate",
     "html_url": "idnovate.com",
     "aliases": [
@@ -204,48 +347,17 @@
     ]
   },
   {
-    "name": "OpenServis",
-    "html_url": "https://www.openservis.cz/",
+    "name": "José Carlos",
+    "html_url": "https://josecarlosphp.com",
     "aliases": [
-      "https://www.openservis.cz/"
+      "josé carlos php."
     ]
   },
   {
-    "name": "Trendo",
-    "html_url": "https://www.trendo.cz/",
+    "name": "Kijam López",
+    "html_url": "https://kijam.com",
     "aliases": [
-      "[TRENDO s.r.o.](https://www.trendo.cz)",
-      "[TRENDO s.r.o.](https://www.trendo.cz/)",
-      "TRENDO s.r.o."
-    ]
-  },
-  {
-    "name": "Franck Lefèvre",
-    "html_url": "https://lefevre.dev/",
-    "aliases": [
-      "lefevre.dev"
-    ]
-  },
-  {
-    "name": "PrestaWorks",
-    "html_url": "https://www.prestaworks.se/",
-    "aliases": [
-      "Prestaworks AB"
-    ]
-  },
-  {
-    "name": "Société Biblique de Genève",
-    "html_url": "https://societebiblique.com",
-    "aliases": [
-      "Société Bilique de Genève"
-    ]
-  },
-  {
-    "name": "Wepika",
-    "html_url": "https://www.wepika.com/",
-    "aliases": [
-      "@Wepika",
-      "@Wepika."
+      "kijam lópez"
     ]
   },
   {
@@ -257,6 +369,20 @@
     ]
   },
   {
+    "name": "Klemart 3D",
+    "html_url": "https://klemart3d.fr",
+    "aliases": [
+      "klemart3d"
+    ]
+  },
+  {
+    "name": "Kosmo",
+    "html_url": "https://e-kosmo.com",
+    "aliases": [
+      "kosmo / webrd"
+    ]
+  },
+  {
     "name": "Krystian Podemski",
     "html_url": "https://podemski.dev/",
     "aliases": [
@@ -265,7 +391,220 @@
     ]
   },
   {
+    "name": "Le Vapoteur Discount",
+    "html_url": "https://www.levapoteur-discount.fr",
+    "aliases": [
+      "le vapoteur discount."
+    ]
+  },
+  {
+    "name": "Lord of Web",
+    "html_url": "https://www.lordofweb.com",
+    "aliases": [
+      "damien tupinier & lord of web"
+    ]
+  },
+  {
+    "name": "Make Digital",
+    "html_url": "https://makedigital.fr",
+    "aliases": [
+      "romain piot - makedigital.fr"
+    ]
+  },
+  {
+    "name": "MariaDB Foundation",
+    "html_url": "https://mariadb.org",
+    "avatar_url": "https://mariadb.org/wp-content/themes/twentynineteen-child/icons/mariadb_org_rgb_h.svg",
+    "aliases": [
+      "mariadb foundation."
+    ]
+  },
+  {
+    "name": "Mediacom87",
+    "html_url": "https://mediacom87.fr",
+    "aliases": [
+      "mediacom87.fr"
+    ]
+  },
+  {
+    "name": "New Orange",
+    "html_url": "https://neworange.agency",
+    "aliases": [
+      "nxtlvl b.v."
+    ]
+  },
+  {
+    "name": "Novius",
+    "html_url": "https://www.novius.com",
+    "aliases": [
+      "novius"
+    ]
+  },
+  {
+    "name": "ohmyweb!",
+    "html_url": "https://www.ohmyweb.fr",
+    "aliases": [
+      "ohmyweb"
+    ]
+  },
+  {
+    "name": "OpenServis",
+    "html_url": "https://www.openservis.cz/",
+    "aliases": [
+      "https://www.openservis.cz/"
+    ]
+  },
+  {
+    "name": "PululuK",
+    "aliases": [
+      "pululuk"
+    ]
+  },
+  {
+    "name": "PrestaWorks",
+    "html_url": "https://www.prestaworks.se/",
+    "aliases": [
+      "Prestaworks AB"
+    ]
+  },
+  {
     "name": "Profileo",
     "html_url": "https://www.profileo.com/"
+  },
+  {
+    "name": "Rubén",
+    "html_url": "https://rubenrc.dev",
+    "aliases": [
+      "rubenrcdev"
+    ]
+  },
+  {
+    "name": "ShopRunners",
+    "html_url": "https://www.shoprunners.de",
+    "aliases": [
+      "shoprunners"
+    ]
+  },
+  {
+    "name": "Sleed",
+    "html_url": "https://www.sleed.com/",
+    "aliases": [
+      "sleed"
+    ]
+  },
+  {
+    "name": "Société Biblique de Genève",
+    "html_url": "https://societebiblique.com",
+    "aliases": [
+      "Société Bilique de Genève"
+    ]
+  },
+  {
+    "name": "Softizy",
+    "html_url": "https://www.softizy.com",
+    "aliases": [
+      "softizy"
+    ]
+  },
+  {
+    "name": "Tesla Cool Lab",
+    "html_url": "https://teslacoollab.com",
+    "aliases": [
+      "teslacoollab.com"
+    ]
+  },
+  {
+    "name": "Thersane",
+    "html_url": "https://www.thersane.fr",
+    "aliases": [
+      "thersane."
+    ]
+  },
+  {
+    "name": "Trendo",
+    "html_url": "https://www.trendo.cz",
+    "aliases": [
+      "[TRENDO s.r.o.](https://www.trendo.cz)",
+      "[TRENDO s.r.o.](https://www.trendo.cz/)",
+      "TRENDO s.r.o."
+    ]
+  },
+  {
+    "name": "Vaisonet",
+    "html_url": "https://www.vaisonet.com",
+    "aliases": [
+      "vaisonet"
+    ]
+  },
+  {
+    "name": "Vendi Facile Online",
+    "html_url": "https://vendifacileonline.com/",
+    "aliases": [
+      "vendi facile online srl"
+    ]
+  },
+  {
+    "name": "Vilkas",
+    "html_url": "https://www.vilkas.fi",
+    "aliases": [
+      "vilkas group"
+    ]
+  },
+  {
+    "name": "WAM",
+    "html_url": "https://wamkey.com",
+    "aliases": [
+      "[wam](https://www.linkedin.com/company/wam-intl/)"
+    ]
+  },
+  {
+    "name": "Waynet",
+    "html_url": "https://www.waynet.io",
+    "aliases": [
+      "waynet"
+    ]
+  },
+  {
+    "name": "Web Area",
+    "html_url": "https://www.webarea.fr",
+    "aliases": [
+      "web area"
+    ]
+  },
+  {
+    "name": "Web Cooking Factory",
+    "html_url": "https://www.web-cooking-factory.com",
+    "aliases": [
+      "web cooking factory"
+    ]
+  },
+  {
+    "name": "Web Helpers",
+    "html_url": "https://www.web-helpers.io",
+    "aliases": [
+      "web helpers"
+    ]
+  },
+  {
+    "name": "Webimpacto Consulting",
+    "html_url": "https://webimpacto.consulting",
+    "aliases": [
+      "webimpacto consulting, s.l"
+    ]
+  },
+  {
+    "name": "Web Premiere",
+    "html_url": "https://www.web-premiere.fr",
+    "aliases": [
+      "web premiere"
+    ]
+  },
+  {
+    "name": "Wepika",
+    "html_url": "https://www.wepika.com",
+    "aliases": [
+      "@Wepika",
+      "@Wepika."
+    ]
   }
 ]
