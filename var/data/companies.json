@@ -119,6 +119,12 @@
           "startDate": "2014-02-24",
           "endDate": ""
         }
+      ],
+      "nicosomb": [
+        {
+          "startDate": "2022-09-05",
+          "endDate": ""
+        }
       ]
     }
   },
@@ -143,7 +149,7 @@
   {
     "name": "Creabilis",
     "html_url": "https://www.creabilis.com/",
-    "avatar_url": "https://www.creabilis.com/images/newLogo.png",   
+    "avatar_url": "https://www.creabilis.com/images/newLogo.png",
     "aliases": [
       "@Creabilis",
       "Creabilis.",
@@ -162,7 +168,7 @@
           "endDate": ""
         }
       ],
-    },    
+    },
   },
   {
     "name": "Evolutive",
