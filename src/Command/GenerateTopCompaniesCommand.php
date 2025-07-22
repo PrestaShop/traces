@@ -117,6 +117,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             throw new RuntimeException('Could not find community company');
         }
 
+        $totalMergedPRs = 0;
         foreach ($data as $key => $datum) {
             // Is the PR is not merged ?
             if ($datum['state'] !== 'MERGED') {
@@ -140,6 +141,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             } else {
                 ++$community->associatedPullRequests;
             }
+            ++$totalMergedPRs;
         }
 
         $this->output->writeLn([
@@ -154,9 +156,9 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         usort($this->companies, function (Company $a, Company $b) {
             return $b->associatedPullRequests - $a->associatedPullRequests;
         });
-        $rankedCompanies = array_filter($this->companies, function (Company $company) {
-            return $company->associatedPullRequests > 0;
-        });
+        $rankedCompanies = array_values(array_filter($this->companies, function (Company $company) use ($community) {
+            return $company->associatedPullRequests > 0 && $company !== $community;
+        }));
 
         $rank = 0;
         $lastScore = null;
@@ -166,6 +168,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             }
 
             $company->rank = $rank;
+            $company->contributionPercent = round($company->associatedPullRequests / $totalMergedPRs * 100, 2);
             $lastScore = $company->associatedPullRequests;
         }
 
