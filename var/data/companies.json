@@ -533,7 +533,15 @@
       "[TRENDO s.r.o.](https://www.trendo.cz)",
       "[TRENDO s.r.o.](https://www.trendo.cz/)",
       "TRENDO s.r.o."
-    ]
+    ],
+    "employees": {
+      "Hlavtox": [
+        {
+          "startDate": "2008-01-01",
+          "endDate": ""
+        }
+      ]
+    }
   },
   {
     "name": "Vaisonet",
