@@ -458,7 +458,15 @@
     "html_url": "https://www.openservis.cz/",
     "aliases": [
       "https://www.openservis.cz/"
-    ]
+    ],
+    "employees": {
+      "ShaiMagal": [
+        {
+          "startDate": "2009-01-01",
+          "endDate": ""
+        }
+      ]
+    }
   },
   {
     "name": "PululuK",
