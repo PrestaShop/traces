@@ -299,19 +299,22 @@ class GenerateTopCompaniesCommand extends AbstractCommand
      */
     protected function displayCompaniesNotFound(): void
     {
-        $this->output->writeLn('There are unknown sponsor companies');
-        // Sort ascending to show the more interesting ones last
-        uasort($this->unknownSponsorCompanies, function (int $prNbA, int $prNbB) {
-            return $prNbA - $prNbB;
-        });
+        if (!empty($this->unknownSponsorCompanies)) {
+            $this->output->writeLn('There are unknown sponsor companies');
+            // Sort ascending to show the more interesting ones last
+            uasort($this->unknownSponsorCompanies, function (int $prNbA, int $prNbB) {
+                return $prNbA - $prNbB;
+            });
 
-        foreach ($this->unknownSponsorCompanies as $company => $numberOfPrs) {
-            $this->output->writeLn(sprintf(
-                '%s (%d)',
-                $company,
-                $numberOfPrs
-            ));
+            foreach ($this->unknownSponsorCompanies as $company => $numberOfPrs) {
+                $this->output->writeLn(sprintf(
+                    '%s (%d)',
+                    $company,
+                    $numberOfPrs
+                ));
+            }
         }
+
         $this->output->writeLn('');
     }
 
