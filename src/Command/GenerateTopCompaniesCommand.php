@@ -137,9 +137,9 @@ class GenerateTopCompaniesCommand extends AbstractCommand
 
             $company = $this->extractCompany($datum);
             if ($company) {
-                ++$company->associatedPullRequests;
+                ++$company->mergedPullRequests;
             } else {
-                ++$community->associatedPullRequests;
+                ++$community->mergedPullRequests;
             }
             ++$totalMergedPRs;
         }
@@ -154,29 +154,31 @@ class GenerateTopCompaniesCommand extends AbstractCommand
 
         // Sort by number of associated PRs filter the companies that didn't contribute any
         usort($this->companies, function (Company $a, Company $b) {
-            return $b->associatedPullRequests - $a->associatedPullRequests;
+            return $b->mergedPullRequests - $a->mergedPullRequests;
         });
+        /** @var Company[] $rankedCompanies */
         $rankedCompanies = array_values(array_filter($this->companies, function (Company $company) use ($community) {
-            return $company->associatedPullRequests > 0 && $company !== $community;
+            return $company->mergedPullRequests > 0 && $company !== $community;
         }));
 
         $rank = 0;
         $lastScore = null;
         foreach ($rankedCompanies as $company) {
-            if ($lastScore === null || $lastScore !== $company->associatedPullRequests) {
+            if ($lastScore === null || $lastScore !== $company->mergedPullRequests) {
                 ++$rank;
             }
 
             $company->rank = $rank;
-            $company->contributionPercent = round($company->associatedPullRequests / $totalMergedPRs * 100, 2);
-            $lastScore = $company->associatedPullRequests;
+            $company->pullRequestsPercent = round($company->mergedPullRequests / $totalMergedPRs * 100, 2);
+            $lastScore = $company->mergedPullRequests;
         }
+        $community->pullRequestsPercent = round($community->mergedPullRequests / $totalMergedPRs * 100, 2);
 
         // Company contributors
         $sumContributions = 0;
         foreach ($rankedCompanies as $company) {
             if ($company !== $community) {
-                $sumContributions += $company->associatedPullRequests;
+                $sumContributions += $company->mergedPullRequests;
             }
         }
 
@@ -185,12 +187,12 @@ class GenerateTopCompaniesCommand extends AbstractCommand
                 '=== Company contributors (Sponsor Company & Linked employees) (%d contributions for %d companies + %d from Community):',
                 $sumContributions,
                 count($rankedCompanies),
-                $community->associatedPullRequests
+                $community->mergedPullRequests
             )
         );
 
         $this->displayCompaniesNotFound();
-        $this->writeFileTopCompanies($rankedCompanies);
+        $this->writeFileTopCompanies($rankedCompanies, $community);
         $this->writeFileGHLoginWOCompany();
 
         return 0;
@@ -323,26 +325,30 @@ class GenerateTopCompaniesCommand extends AbstractCommand
 
     /**
      * @param Company[] $rankedCompanies
+     * @param Company $community
      *
      * @return void
      */
-    protected function writeFileTopCompanies(array $rankedCompanies): void
+    protected function writeFileTopCompanies(array $rankedCompanies, Company $community): void
     {
         $numLastContributions = 0;
         foreach ($rankedCompanies as $company) {
             $this->output->writeLn(sprintf(
                 '%s %s (%d)',
-                $numLastContributions != $company->associatedPullRequests ? sprintf('#%02d', $company->rank) : '   ',
+                $numLastContributions != $company->mergedPullRequests ? sprintf('#%02d', $company->rank) : '   ',
                 $company->name,
-                $company->associatedPullRequests
+                $company->mergedPullRequests
             ));
 
-            $numLastContributions = $company->associatedPullRequests;
+            $numLastContributions = $company->mergedPullRequests;
         }
 
-        \file_put_contents(self::FILE_TOP_COMPANIES, json_encode(array_map(function (Company $company) {
-            return $company->toArray();
-        }, $rankedCompanies), JSON_PRETTY_PRINT));
+        \file_put_contents(self::FILE_TOP_COMPANIES, json_encode([
+            'community' => $community->toArray(),
+            'companies' => array_map(function (Company $company) {
+                return $company->toArray();
+            }, $rankedCompanies),
+        ], JSON_PRETTY_PRINT));
     }
 
     protected function writeFileGHLoginWOCompany(): void
