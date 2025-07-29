@@ -369,7 +369,21 @@
     "aliases": [
       "@friends-of-presta",
       "FOP"
-    ]
+    ],
+    "employees": {
+      "LouisAUTHIE": [
+        {
+          "startDate": "2016-01-01",
+          "endDate": ""
+        }
+      ],
+      "tom-combet": [
+        {
+          "startDate": "2016-01-01",
+          "endDate": ""
+        }
+      ],
+    }
   },
   {
     "name": "Griiv",
