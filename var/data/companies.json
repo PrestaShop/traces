@@ -557,6 +557,23 @@
     ]
   },
   {
+    "name": "PrestaEdit",
+    "html_url": "https://prestaedit.com/",
+    "avatar_url": "https://avatars.githubusercontent.com/u/2631425",
+    "aliases": [
+      "@PrestaEdit",
+      "PrestaEdit"
+    ],
+    "employees": {
+      "PrestaEdit": [
+        {
+          "startDate": "2010-08-01",
+          "endDate": ""
+        }
+      ]
+    }
+  },
+  {
     "name": "PrestaWorks",
     "html_url": "https://www.prestaworks.se/",
     "aliases": [
