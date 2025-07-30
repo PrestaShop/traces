@@ -11,3 +11,4 @@ GitHub contributors:
 - Mathieu Ferment
 - Jonathan Danse
 - Vincent Garcia
+- Thomas Roux
