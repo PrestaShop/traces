@@ -255,13 +255,58 @@
   {
     "name": "202 ecommerce",
     "html_url": "https://www.202-ecommerce.com",
+    "avatar_url": "https://avatars.githubusercontent.com/u/65393221",
     "aliases": [
       "@202ecommerce",
       "@202-ecommerce",
       "202ecommerce",
       "202 ecommerce",
       "202 ecommerce |"
-    ]
+    ],
+    "employees": {
+      "202-ecommerce": [
+        {
+          "startDate": "2012-01-01",
+          "endDate": ""
+        }
+      ],
+      "artem202": [
+        {
+          "startDate": "2012-01-01",
+          "endDate": ""
+        }
+      ],
+      "bogdan202": [
+        {
+          "startDate": "2020-01-01",
+          "endDate": ""
+        }
+      ],
+      "clotairer": [
+        {
+          "startDate": "2017-09-01",
+          "endDate": ""
+        }
+      ],
+      "denys202": [
+        {
+          "startDate": "2020-01-01",
+          "endDate": ""
+        }
+      ],
+      "kgleizes": [
+        {
+          "startDate": "2020-08-01",
+          "endDate": ""
+        }
+      ],
+      "Thomas-lhuillier": [
+        {
+          "startDate": "2016-01-01",
+          "endDate": "2019-12-31"
+        }
+      ]
+    }
   },
   {
     "name": "AD-Dev",
