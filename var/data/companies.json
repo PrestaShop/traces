@@ -724,6 +724,32 @@
     ]
   },
   {
+    "name": "VersusVenture (BusinessTech / PrestaModule)",
+    "html_url": "https://addons.prestashop.com/fr/6_businesstech-prestamodule",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1162527?v=4",
+    "aliases": [
+      "@prestamodule",
+      "PrestaModule",
+      "Presta-Module",
+      "BusinessTech",
+      "Business-Tech"
+    ],
+    "employees": {
+      "prestamodule": [
+        {
+          "startDate": "2010-11-01",
+          "endDate": ""
+        }
+      ],
+      "hadjedjvincent": [
+        {
+          "startDate": "2012-03-01",
+          "endDate": ""
+        }
+      ]
+    }
+  },
+  {
     "name": "Vilkas",
     "html_url": "https://www.vilkas.fi",
     "aliases": [
