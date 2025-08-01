@@ -44,10 +44,10 @@ class GenerateNewContributorsCommand extends AbstractCommand
             return 1;
         }
 
-        if (!file_exists(self::FILE_CONTRIBUTORS)) {
+        if (!file_exists(self::FILE_CONTRIBUTORS_COMMITS)) {
             $this->output->writeLn(sprintf(
                 '%s is missing. Please execute `php bin/console traces:fetch:contributors`',
-                self::FILE_CONTRIBUTORS
+                self::FILE_CONTRIBUTORS_COMMITS
             ));
 
             return 1;
@@ -58,7 +58,7 @@ class GenerateNewContributorsCommand extends AbstractCommand
         $data = json_decode(file_get_contents(self::FILE_PULLREQUESTS), true);
         $pullRequests = $data['pullRequests'];
 
-        $contributors = json_decode(file_get_contents(self::FILE_CONTRIBUTORS), true);
+        $contributors = json_decode(file_get_contents(self::FILE_CONTRIBUTORS_COMMITS), true);
 
         // To get new contributors we check the first contribution PR date, and sort by first contribution date
         $newContributors = [];

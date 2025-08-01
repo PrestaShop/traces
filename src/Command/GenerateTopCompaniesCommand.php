@@ -65,6 +65,32 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             return 1;
         }
 
+        if (!file_exists(self::FILE_CONTRIBUTORS_COMMITS)) {
+            $this->output->writeLn(sprintf(
+                '%s is missing. Please execute `php bin/console traces:fetch:contributors`',
+                self::FILE_CONTRIBUTORS_COMMITS
+            ));
+
+            return 1;
+        }
+        $contributors = json_decode(\file_get_contents(self::FILE_CONTRIBUTORS_COMMITS), true);
+        // Clean contributors
+        unset($contributors['updatedAt']);
+        foreach ($contributors as $key => $contributor) {
+            $contributors[$key]['contributions'] = 0;
+
+            foreach (self::REPOSITORIES_CATEGORIES as $section => $repositories) {
+                $contributors[$key]['categories'][$section] = [
+                    'total' => 0,
+                    'repositories' => [],
+                ];
+                foreach ($repositories as $repository) {
+                    $categories[$section]['repositories'][$repository] = 0;
+                }
+            }
+            $contributors[$key]['repositories'] = [];
+        }
+
         $companiesData = json_decode(\file_get_contents(self::FILE_DATA_COMPANIES), true);
         foreach ($companiesData as $companyData) {
             $employees = [];
@@ -134,6 +160,29 @@ class GenerateTopCompaniesCommand extends AbstractCommand
                 ++$numPRRemoved;
                 continue;
             }
+            $authorLogin = $datum['author']['login'];
+
+            if (isset($contributors[$authorLogin])) {
+                $repository = $datum['repository']['name'];
+                $section = array_reduce(array_keys(self::REPOSITORIES_CATEGORIES), function ($carry, $item) use ($repository) {
+                    return in_array($repository, self::REPOSITORIES_CATEGORIES[$item]) ? $item : $carry;
+                }, 'others');
+
+                ++$contributors[$authorLogin]['contributions'];
+
+                // Repositoies
+                if (!array_key_exists($repository, $contributors[$authorLogin]['repositories'])) {
+                    $contributors[$authorLogin]['repositories'][$repository] = 0;
+                }
+                ++$contributors[$authorLogin]['repositories'][$repository];
+                // Section : Total
+                ++$contributors[$authorLogin]['categories'][$section]['total'];
+                // Section : Repositories
+                if (!array_key_exists($repository, $contributors[$authorLogin]['categories'][$section]['repositories'])) {
+                    $contributors[$authorLogin]['categories'][$section]['repositories'][$repository] = 0;
+                }
+                ++$contributors[$authorLogin]['categories'][$section]['repositories'][$repository];
+            }
 
             $company = $this->extractCompany($datum);
             if ($company) {
@@ -194,6 +243,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         $this->displayCompaniesNotFound();
         $this->writeFileTopCompanies($rankedCompanies, $community);
         $this->writeFileGHLoginWOCompany();
+        $this->writeFileContributorsPRs($contributors);
 
         return 0;
     }
@@ -379,5 +429,40 @@ class GenerateTopCompaniesCommand extends AbstractCommand
 
         $this->configExclusions = $config['exclusions'] ?? [];
         $this->configKeepExcludedUsers = $config['keepExcludedUsers'] ?? false;
+    }
+
+    /**
+     * @param array<string, array{
+     *    login: string,
+     *    id: int,
+     *    avatar_url: string,
+     *    html_url: string,
+     *    name: string,
+     *    company: string,
+     *    blog: string,
+     *    location: string,
+     *    location: string|null,
+     *    email_domain: string,
+     *    contributions: int
+     * }> $contributors
+     */
+    protected function writeFileContributorsPRs(array $contributors): void
+    {
+        // Clean 0-contributions
+        foreach ($contributors as $key => $contributor) {
+            if ($contributor['contributions'] == 0) {
+                unset($contributors[$key]);
+            }
+        }
+
+        // Sort by contributions
+        uasort($contributors, function (array $contributorA, array $contributorB): int {
+            if ($contributorA['contributions'] == $contributorB['contributions']) {
+                return 0;
+            }
+
+            return ($contributorA['contributions'] > $contributorB['contributions']) ? -1 : 1;
+        });
+        \file_put_contents(self::FILE_CONTRIBUTORS_PRS, json_encode($contributors, JSON_PRETTY_PRINT));
     }
 }
