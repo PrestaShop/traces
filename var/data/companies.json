@@ -114,6 +114,12 @@
           "endDate": ""
         }
       ],
+      "eternoendless": [
+        {
+          "startDate": "2017-05-23",
+          "endDate": "2023-10-17"
+        }
+      ],
       "florine2623": [
         {
           "startDate": "2019-01-03",
@@ -178,10 +184,22 @@
           "endDate": "2017-09-15"
         }
       ],
+      "mickaelandrieu": [
+        {
+          "startDate": "2015-12-14",
+          "endDate": "2020-05-19"
+        }
+      ],
       "M0rgan01": [
         {
           "startDate": "2023-05-02",
           "endDate": ""
+        }
+      ],
+      "NeOMakinG": [
+        {
+          "startDate": "2019-11-01",
+          "endDate": "2023-01-31"
         }
       ],
       "nesrineabdmouleh": [
@@ -200,6 +218,12 @@
         {
           "startDate": "2017-09-11",
           "endDate": ""
+        }
+      ],
+      "PierreRambaud": [
+        {
+          "startDate": "2018-04-01",
+          "endDate": "2022-04-30"
         }
       ],
       "PoulainMaxime": [
