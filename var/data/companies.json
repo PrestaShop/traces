@@ -78,6 +78,18 @@
       "Mikatux corp"
     ],
     "employees": {
+      "ga-devfront": [
+        {
+          "startDate": "2022-11-07",
+          "endDate": ""
+        }
+      ],
+      "gericfo": [
+        {
+          "startDate": "2022-05-09",
+          "endDate": ""
+        }
+      ],
       "atomiix": [
         {
           "startDate": "2019-10-14",
@@ -527,7 +539,7 @@
           "startDate": "2016-01-01",
           "endDate": ""
         }
-      ],  
+      ],
       "Kaudaj": [
         {
           "startDate": "2016-01-01",
