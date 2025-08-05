@@ -2,12 +2,10 @@
 
 namespace PrestaShop\Traces\Command;
 
-use RuntimeException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Yaml\Yaml;
 
 class FetchContributorsCommand extends AbstractCommand
 {
@@ -15,20 +13,6 @@ class FetchContributorsCommand extends AbstractCommand
      * @var array<string>
      */
     protected array $orgRepositories = [];
-    /**
-     * @var array<string>
-     */
-    protected array $configExclusions = [];
-    protected bool $configKeepExcludedUsers = false;
-    protected bool $configExtractEmailDomain = false;
-    /**
-     * @var array<string>
-     */
-    protected array $configFieldsWhitelist = [];
-    /**
-     * @var array<string>
-     */
-    protected array $configExcludeRepositories = [];
 
     protected function configure()
     {
@@ -41,7 +25,6 @@ class FetchContributorsCommand extends AbstractCommand
                 '',
                 $_ENV['GH_TOKEN'] ?? null
             )
-            ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, '', 'config.dist.yml')
             ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'GitHub repository');
     }
 
@@ -205,22 +188,5 @@ class FetchContributorsCommand extends AbstractCommand
         $users['updatedAt'] = date('Y-m-d H:i:s');
 
         return $users;
-    }
-
-    protected function fetchConfiguration(string $file): void
-    {
-        if (empty($file)) {
-            return;
-        }
-        if (!file_exists($file) || !is_readable($file)) {
-            throw new RuntimeException(sprintf('File "%s" doesn\'t exist or is not readable', $file));
-        }
-        $config = Yaml::parse(file_get_contents($file) ?: '')['config'] ?? [];
-
-        $this->configExclusions = $config['exclusions'] ?? [];
-        $this->configKeepExcludedUsers = $config['keepExcludedUsers'] ?? false;
-        $this->configExtractEmailDomain = $config['extractEmailDomain'] ?? false;
-        $this->configFieldsWhitelist = $config['fieldsWhitelist'] ? array_flip($config['fieldsWhitelist']) : [];
-        $this->configExcludeRepositories = $config['excludeRepositories'] ?? [];
     }
 }

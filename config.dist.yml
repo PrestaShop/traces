@@ -12,8 +12,8 @@ config:
   extractEmailDomain: true
   keepExcludedUsers: false
   excludeRepositories:
-    - "PrestaShop/PrestaShop-1.6"
-    - "PrestaShop/PrestaShop-1.5"
+    - "PrestaShop-1.6"
+    - "PrestaShop-1.5"
   exclusions:
     - dependabot
     - dependabot[bot]

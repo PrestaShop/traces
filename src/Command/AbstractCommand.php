@@ -3,9 +3,11 @@
 namespace PrestaShop\Traces\Command;
 
 use PrestaShop\Traces\Service\Github;
+use RuntimeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class AbstractCommand extends Command
 {
@@ -247,11 +249,43 @@ class AbstractCommand extends Command
 
     protected OutputInterface $output;
 
+    /**
+     * @var array<string>
+     */
+    protected array $configExclusions = [];
+    protected bool $configKeepExcludedUsers = false;
+    protected bool $configExtractEmailDomain = false;
+    /**
+     * @var array<string>
+     */
+    protected array $configFieldsWhitelist = [];
+    /**
+     * @var array<string>
+     */
+    protected array $configExcludeRepositories = [];
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->github = new Github(APPVAR_DIR, $input->getOption('ghtoken'));
         $this->output = $output;
 
         return 0;
+    }
+
+    protected function fetchConfiguration(string $file): void
+    {
+        if (empty($file)) {
+            return;
+        }
+        if (!file_exists($file) || !is_readable($file)) {
+            throw new RuntimeException(sprintf('File "%s" doesn\'t exist or is not readable', $file));
+        }
+        $config = Yaml::parse(file_get_contents($file) ?: '')['config'] ?? [];
+
+        $this->configExclusions = $config['exclusions'] ?? [];
+        $this->configKeepExcludedUsers = $config['keepExcludedUsers'] ?? false;
+        $this->configExtractEmailDomain = $config['extractEmailDomain'] ?? false;
+        $this->configFieldsWhitelist = $config['fieldsWhitelist'] ? array_flip($config['fieldsWhitelist']) : [];
+        $this->configExcludeRepositories = $config['excludeRepositories'] ?? [];
     }
 }
