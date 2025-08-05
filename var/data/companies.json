@@ -78,18 +78,6 @@
       "Mikatux corp"
     ],
     "employees": {
-      "ga-devfront": [
-        {
-          "startDate": "2022-11-07",
-          "endDate": ""
-        }
-      ],
-      "gericfo": [
-        {
-          "startDate": "2022-05-09",
-          "endDate": ""
-        }
-      ],
       "atomiix": [
         {
           "startDate": "2019-10-14",
@@ -135,6 +123,18 @@
       "florine2623": [
         {
           "startDate": "2019-01-03",
+          "endDate": ""
+        }
+      ],
+      "ga-devfront": [
+        {
+          "startDate": "2022-11-07",
+          "endDate": ""
+        }
+      ],
+      "gericfo": [
+        {
+          "startDate": "2022-05-09",
           "endDate": ""
         }
       ],
@@ -260,6 +260,12 @@
         {
           "startDate": "2019-02-04",
           "endDate": "2020-06-12"
+        }
+      ],
+      "sarahdib": [
+        {
+          "startDate": "2011-09-05",
+          "endDate": ""
         }
       ],
       "SD1982": [
