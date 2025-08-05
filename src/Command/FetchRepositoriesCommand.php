@@ -69,7 +69,7 @@ class FetchRepositoriesCommand extends AbstractCommand
             $afterCursor = $data['data']['organization']['repositories']['pageInfo']['endCursor'] ?? '';
             $data = $this->github->apiSearchGraphQL(sprintf($graphQL, $afterCursor));
             foreach ($data['data']['organization']['repositories']['nodes'] as $node) {
-                if (!in_array($node['name'], $this->configExcludeRepositories)) {
+                if (!$node['isArchived'] || in_array($node['name'], $this->configKeepedRepositories)) {
                   $repositories[] = $node['name'];
                 }
             }

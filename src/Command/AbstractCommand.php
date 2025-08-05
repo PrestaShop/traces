@@ -262,7 +262,7 @@ class AbstractCommand extends Command
     /**
      * @var array<string>
      */
-    protected array $configExcludeRepositories = [];
+    protected array $configKeepedRepositories = [];
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -286,6 +286,6 @@ class AbstractCommand extends Command
         $this->configKeepExcludedUsers = $config['keepExcludedUsers'] ?? false;
         $this->configExtractEmailDomain = $config['extractEmailDomain'] ?? false;
         $this->configFieldsWhitelist = $config['fieldsWhitelist'] ? array_flip($config['fieldsWhitelist']) : [];
-        $this->configExcludeRepositories = $config['excludeRepositories'] ?? [];
+        $this->configKeepedRepositories = $config['keepedRepositories'] ?? [];
     }
 }
