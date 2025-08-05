@@ -70,7 +70,7 @@ class FetchRepositoriesCommand extends AbstractCommand
             $data = $this->github->apiSearchGraphQL(sprintf($graphQL, $afterCursor));
             foreach ($data['data']['organization']['repositories']['nodes'] as $node) {
                 if (!$node['isArchived'] || in_array($node['name'], $this->configKeepedRepositories)) {
-                  $repositories[] = $node['name'];
+                    $repositories[] = $node['name'];
                 }
             }
         } while ($data['data']['organization']['repositories']['pageInfo']['hasNextPage'] === true);
