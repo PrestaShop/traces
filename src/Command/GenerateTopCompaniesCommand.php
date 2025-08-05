@@ -77,7 +77,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         // Clean contributors
         unset($contributors['updatedAt']);
         foreach ($contributors as $key => $contributor) {
-            $contributors[$key]['contributions'] = 0;
+            $contributors[$key]['mergedPullRequests'] = 0;
 
             foreach (self::REPOSITORIES_CATEGORIES as $section => $repositories) {
                 $contributors[$key]['categories'][$section] = [
@@ -144,33 +144,34 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         }
 
         $totalMergedPRs = 0;
-        foreach ($data as $key => $datum) {
+        $totalContributions = 0;
+        foreach ($data as $key => $pullRequestData) {
             // Is the PR is not merged ?
-            if ($datum['state'] !== 'MERGED') {
+            if ($pullRequestData['state'] !== 'MERGED') {
                 unset($key);
                 ++$numPRRemoved;
                 continue;
             }
 
             // Is a user a bot ?
-            if ($datum['author'] === null
-              || $datum['author']['login'] === null
-              || (!$this->configKeepExcludedUsers && in_array($datum['author']['login'], $this->configExclusions, true))) {
+            if ($pullRequestData['author'] === null
+              || $pullRequestData['author']['login'] === null
+              || (!$this->configKeepExcludedUsers && in_array($pullRequestData['author']['login'], $this->configExclusions, true))) {
                 unset($key);
                 ++$numPRRemoved;
                 continue;
             }
-            $authorLogin = $datum['author']['login'];
-            $yearMerged = date('Y', strtotime($datum['mergedAt']));
-            $milestone = $datum['repository']['name'] == 'PrestaShop' ? ($datum['milestone']['title'] ?? null) : null;
+            $authorLogin = $pullRequestData['author']['login'];
+            $yearMerged = date('Y', strtotime($pullRequestData['mergedAt']));
+            $milestone = $pullRequestData['repository']['name'] == 'PrestaShop' ? ($pullRequestData['milestone']['title'] ?? null) : null;
 
             if (isset($contributors[$authorLogin])) {
-                $repository = $datum['repository']['name'];
+                $repository = $pullRequestData['repository']['name'];
                 $section = array_reduce(array_keys(self::REPOSITORIES_CATEGORIES), function ($carry, $item) use ($repository) {
                     return in_array($repository, self::REPOSITORIES_CATEGORIES[$item]) ? $item : $carry;
                 }, 'others');
 
-                ++$contributors[$authorLogin]['contributions'];
+                ++$contributors[$authorLogin]['mergedPullRequests'];
 
                 // Repositoies
                 if (!array_key_exists($repository, $contributors[$authorLogin]['repositories'])) {
@@ -186,7 +187,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
                 ++$contributors[$authorLogin]['categories'][$section]['repositories'][$repository];
             }
 
-            $company = $this->extractCompany($datum);
+            $company = $this->extractCompany($pullRequestData);
             if ($company) {
                 $objCompany = $company;
             } else {
@@ -194,27 +195,44 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             }
             // Company : Total PRs
             ++$objCompany->mergedPullRequests;
+            // Company; Total contributions
+            $pullRequestContributions = $pullRequestData['commits']['totalCount'] ?? 0;
+            $objCompany->contributions += $pullRequestContributions;
             // Company : Total PRs by year
             if (!isset($objCompany->mergedPullRequestsByYear[$yearMerged])) {
                 $objCompany->mergedPullRequestsByYear[$yearMerged] = 0;
                 krsort($objCompany->mergedPullRequestsByYear);
             }
             ++$objCompany->mergedPullRequestsByYear[$yearMerged];
-            // Company : Total PRs by version
+            // Company : Total contributions per year
+            if (!isset($objCompany->mergedContributionsByYear[$yearMerged])) {
+                $objCompany->mergedContributionsByYear[$yearMerged] = 0;
+                krsort($objCompany->mergedContributionsByYear);
+            }
+            $objCompany->mergedContributionsByYear[$yearMerged] += $pullRequestContributions;
             if (!is_null($milestone)) {
                 // Sanitize the milestone & keep the minor version
                 // - 1.7.8.2 => 1.7.8
                 // - 8.0.2 => 8.0
                 $milestone = $milestone[0] === '1' ? substr($milestone, 0, 5) : substr($milestone, 0, 3);
+                // Company : Total PRs by version
                 if (!isset($objCompany->mergedPullRequestsByVersion[$milestone])) {
                     $objCompany->mergedPullRequestsByVersion[$milestone] = 0;
                     krsort($objCompany->mergedPullRequestsByVersion);
                 }
                 ++$objCompany->mergedPullRequestsByVersion[$milestone];
+                // Company : Total contributions by version
+                if (!isset($objCompany->mergedContributionsByVersion[$milestone])) {
+                    $objCompany->mergedContributionsByVersion[$milestone] = 0;
+                    krsort($objCompany->mergedContributionsByVersion);
+                }
+                $objCompany->mergedContributionsByVersion[$milestone] += $pullRequestContributions;
             }
 
             // Total PRs
             ++$totalMergedPRs;
+            // Total contributions
+            $totalContributions += $pullRequestContributions;
         }
 
         $this->output->writeLn([
@@ -229,43 +247,74 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         usort($this->companies, function (Company $a, Company $b) {
             return $b->mergedPullRequests - $a->mergedPullRequests;
         });
-        /** @var Company[] $rankedCompanies */
-        $rankedCompanies = array_values(array_filter($this->companies, function (Company $company) use ($community) {
+        /** @var Company[] $rankedCompaniesByPR */
+        $rankedCompaniesByPR = array_values(array_filter($this->companies, function (Company $company) use ($community) {
             return $company->mergedPullRequests > 0 && $company !== $community;
         }));
-
-        $rank = 0;
+        // Now update the rank of each company
+        $rankByPR = 0;
         $lastScore = null;
-        foreach ($rankedCompanies as $company) {
+        foreach ($rankedCompaniesByPR as $company) {
             if ($lastScore === null || $lastScore !== $company->mergedPullRequests) {
-                ++$rank;
+                ++$rankByPR;
             }
 
-            $company->rank = $rank;
+            $company->rankByPR = $rankByPR;
             $company->pullRequestsPercent = round($company->mergedPullRequests / $totalMergedPRs * 100, 2);
             $lastScore = $company->mergedPullRequests;
         }
         $community->pullRequestsPercent = round($community->mergedPullRequests / $totalMergedPRs * 100, 2);
-
-        // Company contributors
-        $sumContributions = 0;
-        foreach ($rankedCompanies as $company) {
+        // Company pull requests total
+        $companiesPRsTotal = 0;
+        foreach ($rankedCompaniesByPR as $company) {
             if ($company !== $community) {
-                $sumContributions += $company->mergedPullRequests;
+                $companiesPRsTotal += $company->mergedPullRequests;
+            }
+        }
+
+        // Sort by number of contributions
+        usort($this->companies, function (Company $a, Company $b) {
+            return $b->contributions - $a->contributions;
+        });
+        /** @var Company[] $rankedCompaniesByContributions */
+        $rankedCompaniesByContributions = array_values(array_filter($this->companies, function (Company $company) use ($community) {
+            return $company->contributions > 0 && $company !== $community;
+        }));
+        // Now update the rank of each company
+        $rankByContributions = 0;
+        $lastScore = null;
+        foreach ($rankedCompaniesByContributions as $company) {
+            if ($lastScore === null || $lastScore !== $company->mergedPullRequests) {
+                ++$rankByContributions;
+            }
+
+            $company->rankByContributions = $rankByContributions;
+            $company->contributionsPercent = round($company->contributions / $totalContributions * 100, 2);
+            $lastScore = $company->contributions;
+        }
+        $community->contributionsPercent = round($community->contributions / $totalContributions * 100, 2);
+        // Company pull requests total
+        $companiesContributionsTotal = 0;
+        foreach ($rankedCompaniesByPR as $company) {
+            if ($company !== $community) {
+                $companiesContributionsTotal += $company->contributions;
             }
         }
 
         $this->output->writeLn(
             sprintf(
-                '=== Company contributors (Sponsor Company & Linked employees) (%d contributions for %d companies + %d from Community):',
-                $sumContributions,
-                count($rankedCompanies),
-                $community->mergedPullRequests
+                '=== Company contributors (Sponsor Company & Linked employees) (%d PRs (%d contributions) for %d companies + %d PRs (%d contributions) from Community):',
+                $companiesPRsTotal,
+                $companiesContributionsTotal,
+                count($rankedCompaniesByPR),
+                $community->mergedPullRequests,
+                $community->contributions,
             )
         );
 
         $this->displayCompaniesNotFound();
-        $this->writeFileTopCompanies($rankedCompanies, $community);
+        $this->writeFileTopCompaniesByPRs($rankedCompaniesByPR, $community);
+        $this->writeFileTopCompaniesByContributions($rankedCompaniesByContributions, $community);
         $this->writeFileGHLoginWOCompany();
         $this->writeFileContributorsPRs($contributors);
 
@@ -403,13 +452,13 @@ class GenerateTopCompaniesCommand extends AbstractCommand
      *
      * @return void
      */
-    protected function writeFileTopCompanies(array $rankedCompanies, Company $community): void
+    protected function writeFileTopCompaniesByPRs(array $rankedCompanies, Company $community): void
     {
         $numLastContributions = 0;
         foreach ($rankedCompanies as $company) {
             $this->output->writeLn(sprintf(
                 '%s %s (%d)',
-                $numLastContributions != $company->mergedPullRequests ? sprintf('#%02d', $company->rank) : '   ',
+                $numLastContributions != $company->mergedPullRequests ? sprintf('#%02d', $company->rankByPR) : '   ',
                 $company->name,
                 $company->mergedPullRequests
             ));
@@ -417,10 +466,38 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             $numLastContributions = $company->mergedPullRequests;
         }
 
-        \file_put_contents(self::FILE_TOP_COMPANIES, json_encode([
-            'community' => $community->toArray(),
+        \file_put_contents(self::FILE_TOP_COMPANIES_PRS, json_encode([
+            'community' => $community->toArray(false),
             'companies' => array_map(function (Company $company) {
-                return $company->toArray();
+                return $company->toArray(false);
+            }, $rankedCompanies),
+        ], JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * @param Company[] $rankedCompanies
+     * @param Company $community
+     *
+     * @return void
+     */
+    protected function writeFileTopCompaniesByContributions(array $rankedCompanies, Company $community): void
+    {
+        $numLastContributions = 0;
+        foreach ($rankedCompanies as $company) {
+            $this->output->writeLn(sprintf(
+                '%s %s (%d)',
+                $numLastContributions != $company->contributions ? sprintf('#%02d', $company->rankByPR) : '   ',
+                $company->name,
+                $company->mergedPullRequests
+            ));
+
+            $numLastContributions = $company->contributions;
+        }
+
+        \file_put_contents(self::FILE_TOP_COMPANIES, json_encode([
+            'community' => $community->toArray(true),
+            'companies' => array_map(function (Company $company) {
+                return $company->toArray(true);
             }, $rankedCompanies),
         ], JSON_PRETTY_PRINT));
     }
@@ -467,25 +544,25 @@ class GenerateTopCompaniesCommand extends AbstractCommand
      *    location: string,
      *    location: string|null,
      *    email_domain: string,
-     *    contributions: int
+     *    mergedPullRequests: int
      * }> $contributors
      */
     protected function writeFileContributorsPRs(array $contributors): void
     {
         // Clean 0-contributions
         foreach ($contributors as $key => $contributor) {
-            if ($contributor['contributions'] == 0) {
+            if ($contributor['mergedPullRequests'] == 0) {
                 unset($contributors[$key]);
             }
         }
 
         // Sort by contributions
         uasort($contributors, function (array $contributorA, array $contributorB): int {
-            if ($contributorA['contributions'] == $contributorB['contributions']) {
+            if ($contributorA['mergedPullRequests'] == $contributorB['mergedPullRequests']) {
                 return 0;
             }
 
-            return ($contributorA['contributions'] > $contributorB['contributions']) ? -1 : 1;
+            return ($contributorA['mergedPullRequests'] > $contributorB['mergedPullRequests']) ? -1 : 1;
         });
         \file_put_contents(self::FILE_CONTRIBUTORS_PRS, json_encode($contributors, JSON_PRETTY_PRINT));
     }
