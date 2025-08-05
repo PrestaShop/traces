@@ -20,7 +20,7 @@ class FetchRepositoriesCommand extends AbstractCommand
                 $_ENV['GH_TOKEN'] ?? null
             )
             ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, '', 'config.dist.yml')
-            ;
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -69,9 +69,9 @@ class FetchRepositoriesCommand extends AbstractCommand
             $afterCursor = $data['data']['organization']['repositories']['pageInfo']['endCursor'] ?? '';
             $data = $this->github->apiSearchGraphQL(sprintf($graphQL, $afterCursor));
             foreach ($data['data']['organization']['repositories']['nodes'] as $node) {
-              if (!in_array($node['name'], $this->configExcludeRepositories)) {
-                $repositories[] = $node['name'];
-              }
+                if (!in_array($node['name'], $this->configExcludeRepositories)) {
+                  $repositories[] = $node['name'];
+                }
             }
         } while ($data['data']['organization']['repositories']['pageInfo']['hasNextPage'] === true);
 
