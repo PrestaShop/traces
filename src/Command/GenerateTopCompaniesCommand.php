@@ -161,6 +161,8 @@ class GenerateTopCompaniesCommand extends AbstractCommand
                 continue;
             }
             $authorLogin = $datum['author']['login'];
+            $yearMerged = date('Y', strtotime($datum['mergedAt']));
+            $milestone = $datum['repository']['name'] == 'PrestaShop' ? ($datum['milestone']['title'] ?? null) : null;
 
             if (isset($contributors[$authorLogin])) {
                 $repository = $datum['repository']['name'];
@@ -186,10 +188,32 @@ class GenerateTopCompaniesCommand extends AbstractCommand
 
             $company = $this->extractCompany($datum);
             if ($company) {
-                ++$company->mergedPullRequests;
+                $objCompany = $company;
             } else {
-                ++$community->mergedPullRequests;
+                $objCompany = $community;
             }
+            // Company : Total PRs
+            ++$objCompany->mergedPullRequests;
+            // Company : Total PRs by year
+            if (!isset($objCompany->mergedPullRequestsByYear[$yearMerged])) {
+                $objCompany->mergedPullRequestsByYear[$yearMerged] = 0;
+                krsort($objCompany->mergedPullRequestsByYear);
+            }
+            ++$objCompany->mergedPullRequestsByYear[$yearMerged];
+            // Company : Total PRs by version
+            if (!is_null($milestone)) {
+                // Sanitize the milestone & keep the minor version
+                // - 1.7.8.2 => 1.7.8
+                // - 8.0.2 => 8.0
+                $milestone = $milestone[0] === '1' ? substr($milestone, 0, 5) : substr($milestone, 0, 3);
+                if (!isset($objCompany->mergedPullRequestsByVersion[$milestone])) {
+                    $objCompany->mergedPullRequestsByVersion[$milestone] = 0;
+                    krsort($objCompany->mergedPullRequestsByVersion);
+                }
+                ++$objCompany->mergedPullRequestsByVersion[$milestone];
+            }
+
+            // Total PRs
             ++$totalMergedPRs;
         }
 
