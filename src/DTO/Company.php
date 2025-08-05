@@ -32,7 +32,7 @@ class Company
     }
 
     /**
-     * @return array<string, string|int|float>
+     * @return array<string, array<int|string, int>|float|int|string>
      */
     public function toArray(): array
     {

@@ -188,9 +188,9 @@ class GenerateTopCompaniesCommand extends AbstractCommand
 
             $company = $this->extractCompany($datum);
             if ($company) {
-                $objCompany = &$company;
+                $objCompany = $company;
             } else {
-                $objCompany = &$community;
+                $objCompany = $community;
             }
             // Company : Total PRs
             ++$objCompany->mergedPullRequests;
@@ -202,6 +202,9 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             ++$objCompany->mergedPullRequestsByYear[$yearMerged];
             // Company : Total PRs by version
             if (!is_null($milestone)) {
+                // Sanitize the milestone & keep the minor version
+                // - 1.7.8.2 => 1.7.8
+                // - 8.0.2 => 8.0
                 $milestone = $milestone[0] === '1' ? substr($milestone, 0, 5) : substr($milestone, 0, 3);
                 if (!isset($objCompany->mergedPullRequestsByVersion[$milestone])) {
                     $objCompany->mergedPullRequestsByVersion[$milestone] = 0;
