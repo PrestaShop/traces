@@ -25,7 +25,9 @@ class FetchContributorsCommand extends AbstractCommand
                 '',
                 $_ENV['GH_TOKEN'] ?? null
             )
-            ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'GitHub repository');
+            ->addOption('repository', 'r', InputOption::VALUE_OPTIONAL, 'GitHub repository')
+            ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, '', 'config.dist.yml')
+            ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
