@@ -20,6 +20,7 @@ class AbstractCommand extends Command
     protected const FILE_REPOSITORIES = 'gh_repositories.json';
 
     protected const FILE_TOP_COMPANIES = 'topcompanies.json';
+    protected const FILE_TOP_COMPANIES_PRS = 'topcompanies_prs.json';
 
     protected const FILE_NEW_CONTRIBUTORS = 'newcontributors.json';
 
