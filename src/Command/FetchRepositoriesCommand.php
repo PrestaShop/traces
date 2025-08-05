@@ -18,7 +18,9 @@ class FetchRepositoriesCommand extends AbstractCommand
                 InputOption::VALUE_OPTIONAL,
                 '',
                 $_ENV['GH_TOKEN'] ?? null
-            );
+            )
+            ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, '', 'config.dist.yml')
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -26,6 +28,8 @@ class FetchRepositoriesCommand extends AbstractCommand
         parent::execute($input, $output);
 
         $time = time();
+
+        $this->fetchConfiguration($input->getOption('config'));
 
         $repositories = $this->fetchOrgRepositories();
         file_put_contents(self::FILE_REPOSITORIES, json_encode($repositories, JSON_PRETTY_PRINT));
@@ -47,7 +51,7 @@ class FetchRepositoriesCommand extends AbstractCommand
 
         $graphQL = 'query {
       organization(login: "PrestaShop") {
-        repositories(first: 100, after: "%s", isArchived: false, isFork: false, privacy: PUBLIC) {
+        repositories(first: 100, after: "%s", isFork: false, privacy: PUBLIC) {
           totalCount
           pageInfo {
             endCursor
@@ -65,7 +69,9 @@ class FetchRepositoriesCommand extends AbstractCommand
             $afterCursor = $data['data']['organization']['repositories']['pageInfo']['endCursor'] ?? '';
             $data = $this->github->apiSearchGraphQL(sprintf($graphQL, $afterCursor));
             foreach ($data['data']['organization']['repositories']['nodes'] as $node) {
-                $repositories[] = $node['name'];
+                if (!$node['isArchived'] || in_array($node['name'], $this->configKeepedRepositories)) {
+                    $repositories[] = $node['name'];
+                }
             }
         } while ($data['data']['organization']['repositories']['pageInfo']['hasNextPage'] === true);
 
