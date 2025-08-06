@@ -78,6 +78,12 @@
       "Mikatux corp"
     ],
     "employees": {
+      "0x346e3730": [
+        {
+          "startDate": "2022-10-03",
+          "endDate": "2023-06-30"
+        }
+      ],
       "atomiix": [
         {
           "startDate": "2019-10-14",
@@ -154,6 +160,12 @@
           "endDate": ""
         }
       ],
+      "jocel1": [
+        {
+          "startDate": "2015-01-05",
+          "endDate": ""
+        }
+      ],
       "jolelievre": [
         {
           "startDate": "2018-08-01",
@@ -164,6 +176,12 @@
         {
           "startDate": "2021-07-25",
           "endDate": ""
+        }
+      ],
+      "LouiseBonnard": [
+        {
+          "startDate": "2017-10-06",
+          "endDate": "2024-09-13"
         }
       ],
       "marionf": [
