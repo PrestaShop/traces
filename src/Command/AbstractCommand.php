@@ -62,6 +62,7 @@ class AbstractCommand extends Command
             'user-documentation-1.6',
             'user-documentation-v8-en',
             'user-documentation-v8-fr',
+            'functional-documentation',
             'ADR',
             'test-scenarios',
             'example-modules',
@@ -70,6 +71,9 @@ class AbstractCommand extends Command
             'example_module_mailtheme',
             'childtheme-example',
             'module-companion',
+            'ps-docs-theme',
+            'DocToolsBundle',
+            'devdocs-site',
         ],
         'themes' => [
             'classic-theme',
