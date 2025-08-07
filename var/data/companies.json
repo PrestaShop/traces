@@ -657,6 +657,23 @@
     ]
   },
   {
+    "name": "impSolutions",
+    "html_url": "https://impsolutions.pl/",
+    "aliases": [
+      "Mr Podemsky Corp",
+      "Krystian Podemski",
+      "impSolutions"
+    ],
+    "employees": {
+      "kpodemski": [
+        {
+          "startDate": "2010-07-01",
+          "endDate": ""
+        }
+      ]
+    }
+  },
+  {
     "name": "José Carlos",
     "html_url": "https://josecarlosphp.com",
     "aliases": [
@@ -691,23 +708,6 @@
     "aliases": [
       "kosmo / webrd"
     ]
-  },
-  {
-    "name": "impSolutions",
-    "html_url": "https://impsolutions.pl/",
-    "aliases": [
-      "Mr Podemsky Corp",
-      "Krystian Podemski",
-      "impSolutions"
-    ],
-    "employees": {
-      "kpodemski": [
-        {
-          "startDate": "2010-07-01",
-          "endDate": ""
-        }
-      ]
-    }
   },
   {
     "name": "Le Vapoteur Discount",
