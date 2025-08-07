@@ -1,4 +1,4 @@
-generate:
+clean:
 	rm contributors.json
 	rm contributors_prs.json
 	rm gh_loginsWOCompany.json
@@ -7,6 +7,8 @@ generate:
 	rm newcontributors.json
 	rm topcompanies.json
 	rm topcompanies_prs.json
+
+generate:
 	php bin/console traces:fetch:repositories --config="./config.dist.yml"
 	php bin/console traces:fetch:contributors --config="./config.dist.yml"
 	php bin/console traces:fetch:pullrequests:merged
