@@ -58,7 +58,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
 
         if (!file_exists(self::FILE_PULLREQUESTS)) {
             $this->output->writeLn(sprintf(
-                '%s is missing. Please execute `php bin/console traces:fetch:repositories`',
+                '%s is missing. Please execute `php bin/console traces:fetch:pullrequests:merged`',
                 self::FILE_PULLREQUESTS
             ));
 
