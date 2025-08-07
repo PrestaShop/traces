@@ -150,6 +150,12 @@
           "endDate": ""
         }
       ],
+      "gaillafr": [
+        {
+          "startDate": "2011-11-01",
+          "endDate": "2016-01-31"
+        }
+      ],
       "gericfo": [
         {
           "startDate": "2022-05-09",
@@ -350,6 +356,12 @@
         {
           "startDate": "2023-04-03",
           "endDate": ""
+        }
+      ],
+      "xBorderie": [
+        {
+          "startDate": "2011-05-23",
+          "endDate": "2017-10-27"
         }
       ]
     }
