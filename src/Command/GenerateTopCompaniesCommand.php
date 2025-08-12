@@ -486,7 +486,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         foreach ($rankedCompanies as $company) {
             $this->output->writeLn(sprintf(
                 '%s %s (%d)',
-                $numLastContributions != $company->contributions ? sprintf('#%02d', $company->rankByPR) : '   ',
+                $numLastContributions != $company->contributions ? sprintf('#%02d', $company->rankByContributions) : '   ',
                 $company->name,
                 $company->mergedPullRequests
             ));
