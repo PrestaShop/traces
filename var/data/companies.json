@@ -478,6 +478,49 @@
     ]
   },
   {
+    "name": "Beyonds",
+    "html_url": "https://www.beyonds.fr/",
+    "avatar_url": "https://www.beyonds.fr/static/beyonds-logo.png",
+    "aliases": [
+      "@beyondsagency",
+      "beyondsagency",
+      "Agence Beyonds",
+      "beyonds.fr"
+    ],
+    "employees": {
+      "KaitaniRiku0": [
+        {
+          "startDate": "2021-09-06",
+          "endDate": ""
+        }
+      ],
+      "AlexisLavigneBeyonds": [
+        {
+          "startDate": "2020-01-16",
+          "endDate": ""
+        }
+      ],
+      "alexandrebrubeyonds": [
+        {
+          "startDate": "2018-07-01",
+          "endDate": ""
+        }
+      ],
+      "eddy-beyonds": [
+        {
+          "startDate": "2018-07-01",
+          "endDate": ""
+        }
+      ],
+      "PululuK": [
+        {
+          "startDate": "2021-07-19",
+          "endDate": "2022-07-13"
+        }
+      ]
+    ]
+  },
+  {
     "name": "BM Services",
     "html_url": "https://www.bm-services.com",
     "aliases": [
