@@ -243,14 +243,14 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             '',
         ]);
 
-        // Sort by number of associated PRs filter the companies that didn't contribute any
-        usort($this->companies, function (Company $a, Company $b) {
-            return $b->mergedPullRequests - $a->mergedPullRequests;
-        });
         /** @var Company[] $rankedCompaniesByPR */
         $rankedCompaniesByPR = array_values(array_filter($this->companies, function (Company $company) use ($community) {
             return $company->mergedPullRequests > 0 && $company !== $community;
         }));
+        // Sort by number of associated PRs filter the companies that didn't contribute any
+        usort($rankedCompaniesByPR, function (Company $a, Company $b) {
+            return $b->mergedPullRequests - $a->mergedPullRequests;
+        });
         // Now update the rank of each company
         $rankByPR = 0;
         $lastScore = null;
@@ -272,14 +272,14 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             }
         }
 
-        // Sort by number of contributions
-        usort($this->companies, function (Company $a, Company $b) {
-            return $b->contributions - $a->contributions;
-        });
         /** @var Company[] $rankedCompaniesByContributions */
         $rankedCompaniesByContributions = array_values(array_filter($this->companies, function (Company $company) use ($community) {
             return $company->contributions > 0 && $company !== $community;
         }));
+        // Sort by number of contributions
+        usort($rankedCompaniesByContributions, function (Company $a, Company $b) {
+            return $b->contributions - $a->contributions;
+        });
         // Now update the rank of each company
         $rankByContributions = 0;
         $lastScore = null;
@@ -295,25 +295,36 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         $community->contributionsPercent = round($community->contributions / $totalContributions * 100, 2);
         // Company pull requests total
         $companiesContributionsTotal = 0;
-        foreach ($rankedCompaniesByPR as $company) {
+        foreach ($rankedCompaniesByContributions as $company) {
             if ($company !== $community) {
                 $companiesContributionsTotal += $company->contributions;
             }
         }
 
+        $this->displayCompaniesNotFound();
+
         $this->output->writeLn(
             sprintf(
-                '=== Company contributors (Sponsor Company & Linked employees) (%d PRs (%d contributions) for %d companies + %d PRs (%d contributions) from Community):',
+                '=== Company contributors (Sponsor Company & Linked employees) (%d (%.2f%%) PRs for %d companies + %d (%.2f%%) PRs from Community):',
                 $companiesPRsTotal,
-                $companiesContributionsTotal,
+                100 - $community->pullRequestsPercent,
                 count($rankedCompaniesByPR),
                 $community->mergedPullRequests,
-                $community->contributions,
+                $community->pullRequestsPercent,
             )
         );
-
-        $this->displayCompaniesNotFound();
         $this->writeFileTopCompaniesByPRs($rankedCompaniesByPR, $community);
+
+        $this->output->writeLn(
+            sprintf(
+                '=== Company contributors (Sponsor Company & Linked employees) (%d (%.2f%%) contributions for %d companies + %d (%.2f%%) contributions from Community):',
+                $companiesContributionsTotal,
+                100 - $community->contributionsPercent,
+                count($rankedCompaniesByContributions),
+                $community->contributions,
+                $community->contributionsPercent,
+            )
+        );
         $this->writeFileTopCompaniesByContributions($rankedCompaniesByContributions, $community);
         $this->writeFileGHLoginWOCompany();
         $this->writeFileContributorsPRs($contributors);
@@ -457,10 +468,11 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         $numLastContributions = 0;
         foreach ($rankedCompanies as $company) {
             $this->output->writeLn(sprintf(
-                '%s %s (%d)',
+                '%s %s (%d / %.2f%%)',
                 $numLastContributions != $company->mergedPullRequests ? sprintf('#%02d', $company->rankByPR) : '   ',
                 $company->name,
-                $company->mergedPullRequests
+                $company->mergedPullRequests,
+                $company->pullRequestsPercent
             ));
 
             $numLastContributions = $company->mergedPullRequests;
@@ -485,10 +497,11 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         $numLastContributions = 0;
         foreach ($rankedCompanies as $company) {
             $this->output->writeLn(sprintf(
-                '%s %s (%d)',
+                '%s %s (%d / %.2f %%)',
                 $numLastContributions != $company->contributions ? sprintf('#%02d', $company->rankByContributions) : '   ',
                 $company->name,
-                $company->mergedPullRequests
+                $company->contributions,
+                $company->contributionsPercent
             ));
 
             $numLastContributions = $company->contributions;
