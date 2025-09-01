@@ -84,6 +84,12 @@
           "endDate": "2023-06-30"
         }
       ],
+      "AlexEven": [
+        {
+          "startDate": "2014-06-16",
+          "endDate": "2017-06-10"
+        }
+      ],
       "Amoifr": [
         {
           "startDate": "2022-01-01",
@@ -190,6 +196,12 @@
           "endDate": ""
         }
       ],
+      "julienbourdeau": [
+        {
+          "startDate": "2014-02-10",
+          "endDate": "2017-02-17"
+        }
+      ],
       "kelu95": [
         {
           "startDate": "2015-05-01",
@@ -200,6 +212,12 @@
         {
           "startDate": "2021-07-25",
           "endDate": ""
+        }
+      ],
+      "LittleBigDev": [
+        {
+          "startDate": "2017-05-29",
+          "endDate": "2018-04-27"
         }
       ],
       "LouiseBonnard": [
@@ -322,6 +340,12 @@
           "endDate": ""
         }
       ],
+      "SimonasB88": [
+        {
+          "startDate": "2019-04-01",
+          "endDate": "2024-05-31"
+        }
+      ],
       "SimonGrn": [
         {
           "startDate": "2019-04-23",
@@ -344,6 +368,12 @@
         {
           "startDate": "2014-03-31",
           "endDate": "2016-05-16"
+        }
+      ],
+      "thierrymarianne": [
+        {
+          "startDate": "2016-08-01",
+          "endDate": "2017-04-30"
         }
       ],
       "thomasnares": [
