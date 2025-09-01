@@ -480,6 +480,13 @@
     ]
   },
   {
+    "name": "Agence Off",
+    "html_url": "https://www.agenceoff.fr",
+    "aliases": [
+      "agence off"
+    ]
+  },
+  {
     "name": "AGRO-LA",
     "html_url": "https://agrola.cz",
     "aliases": [
@@ -513,8 +520,9 @@
     "avatar_url": "https://www.beyonds.fr/static/beyonds-logo.png",
     "aliases": [
       "@beyondsagency",
-      "beyondsagency",
       "Agence Beyonds",
+      "beyondsagency",
+      "beyonds",
       "beyonds.fr"
     ],
     "employees": {
@@ -635,6 +643,13 @@
     "html_url": "https://danielhlavacek.cz",
     "aliases": [
       "www.danielhlavacek.cz"
+    ]
+  },
+  {
+    "name": "e-frogg",
+    "html_url": "https://www.e-frogg.com",
+    "aliases": [
+      "e-frogg"
     ]
   },
   {
@@ -807,6 +822,13 @@
     "html_url": "https://www.lordofweb.com",
     "aliases": [
       "damien tupinier & lord of web"
+    ]
+  },
+  {
+    "name": "Mademoiselle Bio",
+    "html_url": "https://www.mademoiselle-bio.com",
+    "aliases": [
+      "mademoiselle bio"
     ]
   },
   {
