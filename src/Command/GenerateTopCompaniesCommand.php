@@ -154,14 +154,12 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             }
 
             // Is a user a bot ?
-            if ($pullRequestData['author'] === null
-              || $pullRequestData['author']['login'] === null
-              || (!$this->configKeepExcludedUsers && in_array($pullRequestData['author']['login'], $this->configExclusions, true))) {
+            $authorLogin = $pullRequestData['author']['login'] ?? '';
+            if (!$this->configKeepExcludedUsers && in_array($authorLogin, $this->configExclusions, true)) {
                 unset($key);
                 ++$numPRRemoved;
                 continue;
             }
-            $authorLogin = $pullRequestData['author']['login'];
             $yearMerged = date('Y', strtotime($pullRequestData['mergedAt']));
             $milestone = $pullRequestData['repository']['name'] == 'PrestaShop' ? ($pullRequestData['milestone']['title'] ?? null) : null;
 
@@ -237,7 +235,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
 
         $this->output->writeLn([
             sprintf(
-                '=== Data : %d PRs removed (PR Not in Status = Merged || PR has no Author || PR has a Bot Author)',
+                '=== Data : %d PRs removed (PR Not in Status = Merged || PR has a Bot Author)',
                 $numPRRemoved
             ),
             '',
@@ -333,11 +331,12 @@ class GenerateTopCompaniesCommand extends AbstractCommand
     }
 
     /**
-     * @param array{author: array{login: string}, body: string, createdAt: string, number: int, repository: array{name: string}, mergedAt: string} $datum
+     * @param array{author?: array{login: string}, body: string, createdAt: string, number: int, repository: array{name: string}, mergedAt: string} $datum
      */
     protected function extractCompany(array $datum): ?Company
     {
         $matchCompany = '';
+        $authorLogin = $datum['author']['login'] ?? '';
 
         // Extract company from "Sponsor Company"
         if (preg_match('/\|\h+Sponsor company\h+\|\h+([^\r\n]+)/mu', $datum['body'], $matches)) {
@@ -365,25 +364,25 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         }
 
         // Extract company from "Author"
-        $authorCompany = $this->extractCompanyFromAuthor($datum['author']['login'], $datum['createdAt']);
+        $authorCompany = $this->extractCompanyFromAuthor($authorLogin, $datum['createdAt']);
         if ($authorCompany) {
             return $authorCompany;
         }
 
         // No company found so we store the author as an employee without Company
-        if (!isset($this->companyEmployeesWOCompany[$datum['author']['login']])) {
-            $this->companyEmployeesWOCompany[$datum['author']['login']] = [
+        if (!isset($this->companyEmployeesWOCompany[$authorLogin])) {
+            $this->companyEmployeesWOCompany[$authorLogin] = [
                 'numPRs' => 0,
                 'lastContribution' => '',
             ];
         }
 
         // Num of merged PRs
-        ++$this->companyEmployeesWOCompany[$datum['author']['login']]['numPRs'];
+        ++$this->companyEmployeesWOCompany[$authorLogin]['numPRs'];
         // Last merged PR
-        if (empty($this->companyEmployeesWOCompany[$datum['author']['login']]['lastContribution'])
-            || $this->companyEmployeesWOCompany[$datum['author']['login']]['lastContribution'] < $datum['mergedAt']) {
-            $this->companyEmployeesWOCompany[$datum['author']['login']]['lastContribution'] = $datum['mergedAt'];
+        if (empty($this->companyEmployeesWOCompany[$authorLogin]['lastContribution'])
+            || $this->companyEmployeesWOCompany[$authorLogin]['lastContribution'] < $datum['mergedAt']) {
+            $this->companyEmployeesWOCompany[$authorLogin]['lastContribution'] = $datum['mergedAt'];
         }
 
         return null;
