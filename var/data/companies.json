@@ -864,14 +864,41 @@
     "name": "Kiwik",
     "html_url": "https://www.kiwik.com/",
     "aliases": [
-      "Baptiste-Kiwik",
-      "ivan-kiwik",
-      "Ivan Ramirez",
-      "Jeremie-Kiwik",
       "KIWIK (kiwik.com)",
-      "Studio Kiwik",
-      "studiokiwik"
-    ]
+      "Studio Kiwik"
+    ],
+    "employees": {
+      "Baptiste-Kiwik": [
+        {
+          "startDate": "2024-05-01",
+          "endDate": ""
+        }
+      ],
+      "ivan-kiwik": [
+        {
+          "startDate": "2022-09-01",
+          "endDate": ""
+        }
+      ],
+      "Ivan Ramirez": [
+        {
+          "startDate": "2022-09-01",
+          "endDate": ""
+        }
+      ],
+      "Jeremie-Kiwik": [
+        {
+          "startDate": "2023-01-01",
+          "endDate": ""
+        }
+      ],
+      "studiokiwik": [
+        {
+          "startDate": "2013-06-17",
+          "endDate": ""
+        }
+      ]
+    }
   },
   {
     "name": "Klemart 3D",
