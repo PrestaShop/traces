@@ -863,10 +863,43 @@
   {
     "name": "Kiwik",
     "html_url": "https://www.kiwik.com/",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4717939?s=400&u=1f0d11af9c7298f6420d6667c79e8ebba4a3e8c6&v=4",
     "aliases": [
-      "Studio Kiwik",
-      "KIWIK (kiwik.com)"
-    ]
+      "KIWIK (kiwik.com)",
+      "Studio Kiwik"
+    ],
+    "employees": {
+      "Baptiste-Kiwik": [
+        {
+          "startDate": "2024-05-01",
+          "endDate": ""
+        }
+      ],
+      "CedricKiwik": [
+        {
+          "startDate": "2024-10-28",
+          "endDate": ""
+        }
+      ],
+      "ivan-kiwik": [
+        {
+          "startDate": "2022-09-05",
+          "endDate": ""
+        }
+      ],
+      "Jeremie-Kiwik": [
+        {
+          "startDate": "2023-01-01",
+          "endDate": ""
+        }
+      ],
+      "studiokiwik": [
+        {
+          "startDate": "2013-06-17",
+          "endDate": ""
+        }
+      ]
+    }
   },
   {
     "name": "Klemart 3D",
