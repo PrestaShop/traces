@@ -863,6 +863,7 @@
   {
     "name": "Kiwik",
     "html_url": "https://www.kiwik.com/",
+    "avatar_url": "https://avatars.githubusercontent.com/u/4717939?s=400&u=1f0d11af9c7298f6420d6667c79e8ebba4a3e8c6&v=4",
     "aliases": [
       "KIWIK (kiwik.com)",
       "Studio Kiwik"
@@ -882,13 +883,7 @@
       ],
       "ivan-kiwik": [
         {
-          "startDate": "2022-09-01",
-          "endDate": ""
-        }
-      ],
-      "Ivan Ramirez": [
-        {
-          "startDate": "2022-09-01",
+          "startDate": "2022-09-05",
           "endDate": ""
         }
       ],
