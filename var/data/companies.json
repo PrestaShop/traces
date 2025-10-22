@@ -1219,5 +1219,21 @@
       "@Wepika",
       "@Wepika."
     ]
+  },
+  {
+    "name": "Invertus",
+    "html_url": "https://invertus.eu/",
+    "avatar_url": "https://invertus.eu/wp-content/uploads/2021/11/Invertus-logotipas-SPALVOTAS.svg",
+    "aliases": [
+      "https://www.invertus.eu/"
+    ],
+    "employees": {
+      "tomas862": [
+        {
+          "startDate": "2018-08-22",
+          "endDate": "2020-02-06"
+        }
+      ]
+    }
   }
 ]
