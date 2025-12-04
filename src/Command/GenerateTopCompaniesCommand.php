@@ -37,7 +37,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
      */
     protected array $unknownSponsorCompanies = [];
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('traces:generate:topcompanies')

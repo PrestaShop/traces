@@ -17,7 +17,7 @@ class GenerateNewContributorsCommand extends AbstractCommand
     protected array $configExclusions = [];
     protected bool $configKeepExcludedUsers = false;
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('traces:generate:newcontributors')

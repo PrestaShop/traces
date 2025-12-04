@@ -14,7 +14,7 @@ class FetchContributorsCommand extends AbstractCommand
      */
     protected array $orgRepositories = [];
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('traces:fetch:contributors')
             ->setDescription('Fetch contributors from Github')

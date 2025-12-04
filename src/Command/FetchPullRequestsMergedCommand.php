@@ -13,7 +13,7 @@ class FetchPullRequestsMergedCommand extends AbstractCommand
      */
     protected array $orgRepositories = [];
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('traces:fetch:pullrequests:merged')
             ->setDescription('Fetch merged pullrequests from Github')

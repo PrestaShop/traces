@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FetchRepositoriesCommand extends AbstractCommand
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('traces:fetch:repositories')
             ->setDescription('Fetch repositories from Github')
