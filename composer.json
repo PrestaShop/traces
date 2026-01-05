@@ -11,7 +11,7 @@
         "symfony/dotenv": "^8.0",
         "symfony/console": "^8.0",
         "ext-json": "*",
-        "symfony/yaml": "^7.3"
+        "symfony/yaml": "^8.0"
     },
     "license": "MIT",
     "authors": [
