@@ -1012,7 +1012,15 @@
       "@Touxten",
       "Okom3pom",
       "@Okom3pom"
-    ]
+    ],
+    "employees": {
+      "Touxten": [
+        {
+          "startDate": "2010-01-01",
+          "endDate": ""
+        }
+      ]
+    }
   },  
   {
     "name": "ohmyweb!",
