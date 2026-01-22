@@ -19,9 +19,9 @@ if (file_exists(__DIR__.'/../.env')) {
 }
 
 $app = new Application();
-$app->add(new FetchContributorsCommand());
-$app->add(new FetchPullRequestsMergedCommand());
-$app->add(new FetchRepositoriesCommand());
-$app->add(new GenerateNewContributorsCommand());
-$app->add(new GenerateTopCompaniesCommand());
+$app->addCommand(new FetchContributorsCommand());
+$app->addCommand(new FetchPullRequestsMergedCommand());
+$app->addCommand(new FetchRepositoriesCommand());
+$app->addCommand(new GenerateNewContributorsCommand());
+$app->addCommand(new GenerateTopCompaniesCommand());
 $app->run();

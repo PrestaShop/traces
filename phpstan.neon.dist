@@ -13,3 +13,6 @@ parameters:
       identifier: missingType.iterableValue
       path: src/Service/Github.php
       count: 3
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-symfony/rules.neon
