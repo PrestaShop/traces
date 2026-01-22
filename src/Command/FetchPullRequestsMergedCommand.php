@@ -22,7 +22,7 @@ class FetchPullRequestsMergedCommand extends AbstractCommand
                 null,
                 InputOption::VALUE_OPTIONAL,
                 '',
-                $_ENV['GH_TOKEN'] ?? null
+                isset($_ENV['GH_TOKEN']) ? (string) $_ENV['GH_TOKEN'] : null
             );
     }
 
