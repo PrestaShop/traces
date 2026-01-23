@@ -603,6 +603,13 @@
     ]
   },
   {
+    "name": "AlienGen",
+    "html_url": "https://www.aliengen.com",
+    "aliases":[
+      "AlienGen"
+    ]
+  },
+  {
     "name": "Avalanche Media",
     "html_url": "https://avalanchemedia.cz",
     "aliases": [
@@ -818,6 +825,12 @@
     }
   },
   {
+    "name": "Giuseppe Tripiciano",
+    "aliases": [
+      "giuseppe tripiciano"
+    ]
+  },
+  {
     "name": "Griiv",
     "html_url": "https://griiv.fr",
     "aliases": [
@@ -877,6 +890,14 @@
         }
       ]
     }
+  },
+  {
+    "name": "Inform-All",
+    "html_url": "https://inform-all.nl",
+    "avatar_url": "https://inform-all.nl/img/logo.png",
+    "aliases": [
+      "inform-all"
+    ]
   },
   {
     "name": "José Carlos",
@@ -1111,6 +1132,14 @@
     "html_url": "https://www.softizy.com",
     "aliases": [
       "softizy"
+    ]
+  },
+  {
+    "name": "Soledis",
+    "html_url": "https://www.soledis.com",
+    "avatar_url": "https://www.soledis.com/wp-content/uploads/fbrfg/favicon.svg",
+    "aliases": [
+      "soledis"
     ]
   },
   {
