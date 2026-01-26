@@ -346,21 +346,20 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             $company = $this->getCompanyByAlias($matchCompany);
             if ($company) {
                 return $company;
-            } else {
-                $this->output->writeln(
-                    'Sponsor Company Not Found : '
-                    . $datum['repository']['name']
-                    . '#' . $datum['number']
-                    . ' => ' . $datum['author']['login']
-                    . '/' . $matchCompany
-                );
-                if (!isset($this->unknownSponsorCompanies[$matchCompany])) {
-                    $this->unknownSponsorCompanies[$matchCompany] = 0;
-                }
-                ++$this->unknownSponsorCompanies[$matchCompany];
-
-                return null;
             }
+            $this->output->writeln(
+                'Sponsor Company Not Found : '
+                . $datum['repository']['name']
+                . '#' . $datum['number']
+                . ' => ' . $datum['author']['login']
+                . '/' . $matchCompany
+            );
+            if (!isset($this->unknownSponsorCompanies[$matchCompany])) {
+                $this->unknownSponsorCompanies[$matchCompany] = 0;
+            }
+            ++$this->unknownSponsorCompanies[$matchCompany];
+
+            return null;
         }
 
         // Extract company from "Author"
