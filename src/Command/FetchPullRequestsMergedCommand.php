@@ -31,7 +31,7 @@ class FetchPullRequestsMergedCommand extends AbstractCommand
         parent::execute($input, $output);
 
         if (!file_exists(self::FILE_REPOSITORIES)) {
-            $this->output->writeLn('gh_repositories.json is missing. Please execute `php bin/console traces:fetch:repositories`');
+            $this->output->writeLn(self::FILE_REPOSITORIES . ' is missing. Please execute `php bin/console traces:fetch:repositories`');
 
             return 1;
         }

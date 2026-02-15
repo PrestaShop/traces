@@ -34,8 +34,8 @@ class FetchContributorsCommand extends AbstractCommand
     {
         parent::execute($input, $output);
 
-        if (!file_exists('gh_repositories.json')) {
-            $this->output->writeLn('gh_repositories.json is missing. Please execute `php bin/console traces:fetch:repositories`');
+        if (!file_exists(self::FILE_REPOSITORIES)) {
+            $this->output->writeLn(self::FILE_REPOSITORIES . ' is missing. Please execute `php bin/console traces:fetch:repositories`');
 
             return 1;
         }
@@ -44,7 +44,7 @@ class FetchContributorsCommand extends AbstractCommand
         if (!empty($repository)) {
             $this->orgRepositories = [$repository];
         } else {
-            $this->orgRepositories = json_decode(file_get_contents('gh_repositories.json') ?: '', true);
+            $this->orgRepositories = json_decode(file_get_contents(self::FILE_REPOSITORIES) ?: '', true);
         }
         $this->output->writeLn('Fetching contributors data for these repositories: ' . implode(', ', $this->orgRepositories));
 
