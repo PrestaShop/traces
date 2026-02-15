@@ -264,6 +264,7 @@ class AbstractCommand extends Command
             'engineering',
             '.github',
             'ps-org-theme',
+            'zip-archives',
         ],
     ];
 
