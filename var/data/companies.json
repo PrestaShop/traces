@@ -1006,6 +1006,13 @@
     ]
   },
   {
+    "name": "MaoDev",
+    "html_url": "https://www.maofree-developer.com",
+    "aliases": [
+      "maodev"
+    ]
+  },
+  {
     "name": "MariaDB Foundation",
     "html_url": "https://mariadb.org",
     "avatar_url": "https://mariadb.org/wp-content/themes/twentynineteen-child/icons/mariadb_org_rgb_h.svg",
