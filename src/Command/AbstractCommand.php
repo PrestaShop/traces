@@ -84,6 +84,7 @@ class AbstractCommand extends Command
             'community-theme-16',
             'hummingbird',
             'StarterTheme',
+            'minimal-theme',
         ],
         'modules' => [
             'PrestaShop-modules',
