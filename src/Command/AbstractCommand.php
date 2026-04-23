@@ -78,13 +78,13 @@ class AbstractCommand extends Command
             'contextual-help-api',
             'keycloak_connector_demo',
             'webservice-postman-examples',
+            'minimal-theme',
         ],
         'themes' => [
             'classic-theme',
             'community-theme-16',
             'hummingbird',
             'StarterTheme',
-            'minimal-theme',
         ],
         'modules' => [
             'PrestaShop-modules',
