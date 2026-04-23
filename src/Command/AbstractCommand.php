@@ -212,6 +212,7 @@ class AbstractCommand extends Command
             'ps_distributionapiclient',
             'ps_fixturescreator',
             'themeinstallator',
+            'ps_onepagecheckout',
         ],
         'tools' => [
             '.github',
