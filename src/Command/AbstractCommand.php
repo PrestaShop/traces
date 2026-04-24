@@ -79,6 +79,7 @@ class AbstractCommand extends Command
             'keycloak_connector_demo',
             'webservice-postman-examples',
             'minimal-theme',
+            'skills',
         ],
         'themes' => [
             'classic-theme',
