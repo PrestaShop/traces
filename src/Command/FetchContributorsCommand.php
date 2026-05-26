@@ -145,10 +145,19 @@ class FetchContributorsCommand extends AbstractCommand
                             : substr($userEmail, strpos($userEmail, '@') + 1);
                     }
 
-                    // add exclusion property if setting enabled
+                    // Add exclusion property if setting enabled
                     if ($this->configKeepExcludedUsers) {
                         $user['excluded'] = in_array($ghLogin, $this->configExclusions, true);
                     }
+
+                    // Fixed scheme for blog
+                    $user['blog'] = empty($user['blog'])
+                        ? ''
+                        : (
+                            (str_starts_with($user['blog'], 'http://') || str_starts_with($user['blog'], 'https://'))
+                            ? $user['blog']
+                            : ('https://' . $user['blog'])
+                        );
 
                     $user['contributions'] = 0;
                     $user['repositories'] = [];
