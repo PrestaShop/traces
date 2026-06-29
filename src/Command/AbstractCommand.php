@@ -25,6 +25,16 @@ class AbstractCommand extends Command
 
     protected const FILE_NEW_CONTRIBUTORS = 'newcontributors.json';
 
+    protected const FILE_ISSUES = 'gh_issues.json';
+
+    protected const FILE_PULLREQUESTS_ALL = 'gh_pullrequests_all.json';
+
+    protected const FILE_TOP_REVIEWERS = 'top_reviewers.json';
+
+    protected const FILE_TOP_ISSUES = 'top_issues.json';
+
+    protected const FILE_TOP_PULLREQUESTS = 'top_pullrequests.json';
+
     protected const FILE_GHLOGIN_WO_COMPANY = 'gh_loginsWOCompany.json';
 
     protected const FILE_DATA_COMPANIES = 'var/data/companies.json';
