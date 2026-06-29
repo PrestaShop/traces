@@ -109,13 +109,13 @@ class FetchPullRequestsAllCommand extends AbstractCommand
                     ];
                 }
 
-                file_put_contents(self::FILE_PULLREQUESTS_ALL, json_encode($pullRequests, JSON_PRETTY_PRINT));
-
                 $this->output->writeLn([
                     'Repository : PrestaShop/' . $repository
                     . ' > Status: ' . $pullRequestsCount . ' / ' . $data['data']['repository']['pullRequests']['totalCount']
                     . ' - Total: ' . count($pullRequests)]);
             } while ($data['data']['repository']['pullRequests']['pageInfo']['hasNextPage'] === true);
+
+            file_put_contents(self::FILE_PULLREQUESTS_ALL, json_encode($pullRequests, JSON_PRETTY_PRINT));
         }
     }
 }

@@ -23,6 +23,3 @@ gh_pullrequests_all.json
 top_reviewers.json
 top_issues.json
 top_pullrequests.json
-
-# Superpowers workflow docs (kept local only)
-docs/superpowers/

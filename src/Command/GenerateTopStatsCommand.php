@@ -31,12 +31,11 @@ class GenerateTopStatsCommand extends AbstractCommand
 
         // contributors_prs.json is produced by traces:generate:topcompanies, so this
         // command must run after it (and after the two fetch commands below).
-        $requiredFiles = [
+        foreach ([
             self::FILE_PULLREQUESTS_ALL => 'traces:fetch:pullrequests:all',
             self::FILE_ISSUES => 'traces:fetch:issues',
             self::FILE_CONTRIBUTORS_PRS => 'traces:generate:topcompanies',
-        ];
-        foreach ($requiredFiles as $required => $command) {
+        ] as $required => $command) {
             if (!file_exists($required)) {
                 $this->output->writeLn(sprintf('%s is missing. Please execute `php bin/console %s`', $required, $command));
 
@@ -53,7 +52,7 @@ class GenerateTopStatsCommand extends AbstractCommand
         /** @var array<string, mixed> $contributors */
         $contributors = json_decode(file_get_contents(self::FILE_CONTRIBUTORS_PRS) ?: '', true);
 
-        $aggregate = self::aggregate($pullRequests, $issues);
+        $aggregate = $this->aggregate($pullRequests, $issues);
 
         $this->enrichContributors($contributors, $aggregate);
         file_put_contents(self::FILE_CONTRIBUTORS_PRS, json_encode($contributors, JSON_PRETTY_PRINT));
@@ -73,7 +72,7 @@ class GenerateTopStatsCommand extends AbstractCommand
      *
      * @return array{reviews: array<string,int>, issuesOpened: array<string,int>, pullRequestsOpened: array<string,int>}
      */
-    public static function aggregate(array $pullRequests, array $issues): array
+    public function aggregate(array $pullRequests, array $issues): array
     {
         $reviews = [];
         $pullRequestsOpened = [];

@@ -98,13 +98,13 @@ class FetchIssuesCommand extends AbstractCommand
                     ];
                 }
 
-                file_put_contents(self::FILE_ISSUES, json_encode($issues, JSON_PRETTY_PRINT));
-
                 $this->output->writeLn([
                     'Repository : PrestaShop/' . $repository
                     . ' > Status: ' . $issuesCount . ' / ' . $data['data']['repository']['issues']['totalCount']
                     . ' - Total: ' . count($issues)]);
             } while ($data['data']['repository']['issues']['pageInfo']['hasNextPage'] === true);
+
+            file_put_contents(self::FILE_ISSUES, json_encode($issues, JSON_PRETTY_PRINT));
         }
     }
 }
