@@ -9,6 +9,7 @@ use PrestaShop\Traces\Command\FetchPullRequestsMergedCommand;
 use PrestaShop\Traces\Command\FetchRepositoriesCommand;
 use PrestaShop\Traces\Command\GenerateNewContributorsCommand;
 use PrestaShop\Traces\Command\GenerateTopCompaniesCommand;
+use PrestaShop\Traces\Command\GenerateTopStatsCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Dotenv\Dotenv;
 
@@ -28,4 +29,5 @@ $app->addCommand(new FetchPullRequestsMergedCommand());
 $app->addCommand(new FetchRepositoriesCommand());
 $app->addCommand(new GenerateNewContributorsCommand());
 $app->addCommand(new GenerateTopCompaniesCommand());
+$app->addCommand(new GenerateTopStatsCommand());
 $app->run();
