@@ -40,6 +40,19 @@ The authentication use a Github Token.
  # 5- Fetch top companies
  $ php bin/console traces:generate:topcompanies --config="config.yml"
  ## Files topcompanies.json and gh_loginsWOCompany.json are generated
+
+ # 6- Fetch all pull requests (any state) and their reviewers
+ $ php bin/console traces:fetch:pullrequests:all
+ ## A file gh_pullrequests_all.json is generated
+
+ # 7- Fetch issues (excluding pull requests)
+ $ php bin/console traces:fetch:issues
+ ## A file gh_issues.json is generated
+
+ # 8- Generate reviewers/issues/pull-requests leaderboards
+ $ php bin/console traces:generate:topstats --config="config.yml"
+ ## Files top_reviewers.json, top_issues.json, top_pullrequests.json are generated
+ ## and contributors_prs.json is enriched with reviews / issuesOpened / pullRequestsOpened
 ```
 
 ## Configuring

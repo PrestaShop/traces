@@ -3,10 +3,13 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use PrestaShop\Traces\Command\FetchContributorsCommand;
+use PrestaShop\Traces\Command\FetchIssuesCommand;
+use PrestaShop\Traces\Command\FetchPullRequestsAllCommand;
 use PrestaShop\Traces\Command\FetchPullRequestsMergedCommand;
 use PrestaShop\Traces\Command\FetchRepositoriesCommand;
 use PrestaShop\Traces\Command\GenerateNewContributorsCommand;
 use PrestaShop\Traces\Command\GenerateTopCompaniesCommand;
+use PrestaShop\Traces\Command\GenerateTopStatsCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Dotenv\Dotenv;
 
@@ -20,8 +23,11 @@ if (file_exists(__DIR__.'/../.env')) {
 
 $app = new Application();
 $app->addCommand(new FetchContributorsCommand());
+$app->addCommand(new FetchIssuesCommand());
+$app->addCommand(new FetchPullRequestsAllCommand());
 $app->addCommand(new FetchPullRequestsMergedCommand());
 $app->addCommand(new FetchRepositoriesCommand());
 $app->addCommand(new GenerateNewContributorsCommand());
 $app->addCommand(new GenerateTopCompaniesCommand());
+$app->addCommand(new GenerateTopStatsCommand());
 $app->run();
