@@ -5,12 +5,9 @@ namespace PrestaShop\Traces\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Throwable;
 
 class GenerateTopStatsCommand extends AbstractCommand
 {
-    private const TOP_N = 25;
-
     protected function configure(): void
     {
         $this->setName('traces:generate:topstats')
@@ -27,6 +24,10 @@ class GenerateTopStatsCommand extends AbstractCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // This command makes no GitHub API call: identity comes from the fetched
+        // files. The --ghtoken option is kept only for pipeline compatibility
+        // (Makefile / gh-pages.yml pass it); parent::execute() still sets up an
+        // unused Github client.
         parent::execute($input, $output);
 
         // contributors_prs.json is produced by traces:generate:topcompanies, so this
@@ -45,21 +46,22 @@ class GenerateTopStatsCommand extends AbstractCommand
 
         $this->fetchConfiguration($input->getOption('config'));
 
-        /** @var array<array{number:int, login:string|null, reviewers:array<string>}> $pullRequests */
+        /** @var array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, reviewers:array<array{login:string, name:string|null, avatar_url:string|null, html_url:string|null}>}> $pullRequests */
         $pullRequests = json_decode(file_get_contents(self::FILE_PULLREQUESTS_ALL) ?: '', true);
-        /** @var array<array{number:int, login:string|null, repository:string}> $issues */
+        /** @var array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, repository:string}> $issues */
         $issues = json_decode(file_get_contents(self::FILE_ISSUES) ?: '', true);
         /** @var array<string, mixed> $contributors */
         $contributors = json_decode(file_get_contents(self::FILE_CONTRIBUTORS_PRS) ?: '', true);
 
+        $identities = $this->buildIdentities($pullRequests, $issues);
         $aggregate = $this->aggregate($pullRequests, $issues);
 
         $this->enrichContributors($contributors, $aggregate);
         file_put_contents(self::FILE_CONTRIBUTORS_PRS, json_encode($contributors, JSON_PRETTY_PRINT));
 
-        file_put_contents(self::FILE_TOP_REVIEWERS, json_encode($this->buildRanking($aggregate['reviews'], $contributors), JSON_PRETTY_PRINT));
-        file_put_contents(self::FILE_TOP_ISSUES, json_encode($this->buildRanking($aggregate['issuesOpened'], $contributors), JSON_PRETTY_PRINT));
-        file_put_contents(self::FILE_TOP_PULLREQUESTS, json_encode($this->buildRanking($aggregate['pullRequestsOpened'], $contributors), JSON_PRETTY_PRINT));
+        file_put_contents(self::FILE_TOP_REVIEWERS, json_encode($this->buildRanking($aggregate['reviews'], $contributors, $identities), JSON_PRETTY_PRINT));
+        file_put_contents(self::FILE_TOP_ISSUES, json_encode($this->buildRanking($aggregate['issuesOpened'], $contributors, $identities), JSON_PRETTY_PRINT));
+        file_put_contents(self::FILE_TOP_PULLREQUESTS, json_encode($this->buildRanking($aggregate['pullRequestsOpened'], $contributors, $identities), JSON_PRETTY_PRINT));
 
         $this->output->writeLn(['', 'Top stats generated.']);
 
@@ -67,8 +69,8 @@ class GenerateTopStatsCommand extends AbstractCommand
     }
 
     /**
-     * @param array<array{number:int, login:string|null, reviewers:array<string>}> $pullRequests
-     * @param array<array{number:int, login:string|null, repository:string}> $issues
+     * @param array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, reviewers:array<array{login:string, name:string|null, avatar_url:string|null, html_url:string|null}>}> $pullRequests
+     * @param array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, repository:string}> $issues
      *
      * @return array{reviews: array<string,int>, issuesOpened: array<string,int>, pullRequestsOpened: array<string,int>}
      */
@@ -86,10 +88,11 @@ class GenerateTopStatsCommand extends AbstractCommand
             // A review counts for its reviewer regardless of the PR author (even a
             // deleted/null author) — only self-reviews are excluded.
             foreach ($pullRequest['reviewers'] as $reviewer) {
-                if ($reviewer === $author) {
+                $reviewerLogin = $reviewer['login'];
+                if ($reviewerLogin === $author) {
                     continue;
                 }
-                $reviews[$reviewer] = ($reviews[$reviewer] ?? 0) + 1;
+                $reviews[$reviewerLogin] = ($reviews[$reviewerLogin] ?? 0) + 1;
             }
         }
 
@@ -105,6 +108,39 @@ class GenerateTopStatsCommand extends AbstractCommand
             'issuesOpened' => $issuesOpened,
             'pullRequestsOpened' => $pullRequestsOpened,
         ];
+    }
+
+    /**
+     * @param array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, reviewers:array<array{login:string, name:string|null, avatar_url:string|null, html_url:string|null}>}> $pullRequests
+     * @param array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, repository:string}> $issues
+     *
+     * @return array<string, array{name:string, avatar_url:string, html_url:string}>
+     */
+    public function buildIdentities(array $pullRequests, array $issues): array
+    {
+        $identities = [];
+        $add = function (?string $login, ?string $name, ?string $avatarUrl, ?string $url) use (&$identities): void {
+            if ($login === null || isset($identities[$login])) {
+                return;
+            }
+            $identities[$login] = [
+                'name' => $name ?? $login,
+                'avatar_url' => $avatarUrl ?? '',
+                'html_url' => $url ?? 'https://github.com/' . $login,
+            ];
+        };
+
+        foreach ($pullRequests as $pullRequest) {
+            $add($pullRequest['login'] ?? null, $pullRequest['name'] ?? null, $pullRequest['avatar_url'] ?? null, $pullRequest['html_url'] ?? null);
+            foreach ($pullRequest['reviewers'] as $reviewer) {
+                $add($reviewer['login'], $reviewer['name'] ?? null, $reviewer['avatar_url'] ?? null, $reviewer['html_url'] ?? null);
+            }
+        }
+        foreach ($issues as $issue) {
+            $add($issue['login'] ?? null, $issue['name'] ?? null, $issue['avatar_url'] ?? null, $issue['html_url'] ?? null);
+        }
+
+        return $identities;
     }
 
     /**
@@ -127,10 +163,11 @@ class GenerateTopStatsCommand extends AbstractCommand
     /**
      * @param array<string,int> $counts
      * @param array<string, mixed> $contributors
+     * @param array<string, array{name:string, avatar_url:string, html_url:string}> $identities
      *
      * @return array{updatedAt: string, items: array<array{rank:int, login:string, name:string, avatar_url:string, html_url:string, count:int}>}
      */
-    private function buildRanking(array $counts, array $contributors): array
+    private function buildRanking(array $counts, array $contributors, array $identities): array
     {
         $logins = array_keys($counts);
         usort($logins, function (string $a, string $b) use ($counts): int {
@@ -146,7 +183,7 @@ class GenerateTopStatsCommand extends AbstractCommand
             if (!$this->configKeepExcludedUsers && in_array($login, $this->configExclusions, true)) {
                 continue;
             }
-            $identity = $this->resolveIdentity($login, $contributors);
+            $identity = $this->resolveIdentity($login, $contributors, $identities);
             $items[] = [
                 'rank' => $rank,
                 'login' => $login,
@@ -155,9 +192,7 @@ class GenerateTopStatsCommand extends AbstractCommand
                 'html_url' => $identity['html_url'],
                 'count' => $counts[$login],
             ];
-            if (++$rank > self::TOP_N) {
-                break;
-            }
+            ++$rank;
         }
 
         return ['updatedAt' => date('Y-m-d'), 'items' => $items];
@@ -165,10 +200,11 @@ class GenerateTopStatsCommand extends AbstractCommand
 
     /**
      * @param array<string, mixed> $contributors
+     * @param array<string, array{name:string, avatar_url:string, html_url:string}> $identities
      *
      * @return array{name:string, avatar_url:string, html_url:string}
      */
-    private function resolveIdentity(string $login, array $contributors): array
+    private function resolveIdentity(string $login, array $contributors, array $identities): array
     {
         if (isset($contributors[$login]) && is_array($contributors[$login])) {
             $record = $contributors[$login];
@@ -180,20 +216,14 @@ class GenerateTopStatsCommand extends AbstractCommand
             ];
         }
 
-        try {
-            $user = $this->github->getUser($login);
-
-            return [
-                'name' => (string) ($user['name'] ?? $login),
-                'avatar_url' => (string) ($user['avatar_url'] ?? ''),
-                'html_url' => (string) ($user['html_url'] ?? 'https://github.com/' . $login),
-            ];
-        } catch (Throwable) {
-            return [
-                'name' => $login,
-                'avatar_url' => '',
-                'html_url' => 'https://github.com/' . $login,
-            ];
+        if (isset($identities[$login])) {
+            return $identities[$login];
         }
+
+        return [
+            'name' => $login,
+            'avatar_url' => '',
+            'html_url' => 'https://github.com/' . $login,
+        ];
     }
 }

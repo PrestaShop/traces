@@ -73,11 +73,21 @@ class FetchPullRequestsAllCommand extends AbstractCommand
                     number
                     author {
                       login
+                      avatarUrl
+                      url
+                      ... on User {
+                        name
+                      }
                     }
                     reviews(first: 100) {
                       nodes {
                         author {
                           login
+                          avatarUrl
+                          url
+                          ... on User {
+                            name
+                          }
                         }
                       }
                     }
@@ -97,15 +107,25 @@ class FetchPullRequestsAllCommand extends AbstractCommand
                 foreach ($nodes as $node) {
                     $reviewers = [];
                     foreach ($node['reviews']['nodes'] as $review) {
-                        $reviewerLogin = $review['author']['login'] ?? null;
-                        if ($reviewerLogin !== null) {
-                            $reviewers[$reviewerLogin] = true;
+                        $reviewer = $review['author'] ?? null;
+                        $reviewerLogin = $reviewer['login'] ?? null;
+                        if ($reviewerLogin !== null && !isset($reviewers[$reviewerLogin])) {
+                            $reviewers[$reviewerLogin] = [
+                                'login' => $reviewerLogin,
+                                'name' => $reviewer['name'] ?? null,
+                                'avatar_url' => $reviewer['avatarUrl'] ?? null,
+                                'html_url' => $reviewer['url'] ?? null,
+                            ];
                         }
                     }
+                    $author = $node['author'] ?? null;
                     $pullRequests[] = [
                         'number' => $node['number'],
-                        'login' => $node['author']['login'] ?? null,
-                        'reviewers' => array_keys($reviewers),
+                        'login' => $author['login'] ?? null,
+                        'name' => $author['name'] ?? null,
+                        'avatar_url' => $author['avatarUrl'] ?? null,
+                        'html_url' => $author['url'] ?? null,
+                        'reviewers' => array_values($reviewers),
                     ];
                 }
 

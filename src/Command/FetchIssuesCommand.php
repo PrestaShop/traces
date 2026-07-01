@@ -73,6 +73,11 @@ class FetchIssuesCommand extends AbstractCommand
                     number
                     author {
                       login
+                      avatarUrl
+                      url
+                      ... on User {
+                        name
+                      }
                     }
                     repository {
                       name
@@ -91,9 +96,13 @@ class FetchIssuesCommand extends AbstractCommand
                 $issuesCount += count($nodes);
 
                 foreach ($nodes as $node) {
+                    $author = $node['author'] ?? null;
                     $issues[] = [
                         'number' => $node['number'],
-                        'login' => $node['author']['login'] ?? null,
+                        'login' => $author['login'] ?? null,
+                        'name' => $author['name'] ?? null,
+                        'avatar_url' => $author['avatarUrl'] ?? null,
+                        'html_url' => $author['url'] ?? null,
                         'repository' => $node['repository']['name'],
                     ];
                 }
