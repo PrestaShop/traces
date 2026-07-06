@@ -35,6 +35,10 @@ class AbstractCommand extends Command
 
     protected const FILE_TOP_PULLREQUESTS = 'top_pullrequests.json';
 
+    protected const FILE_SECURITY_ADVISORIES = 'gh_security_advisories.json';
+
+    protected const FILE_TOP_SECURITY = 'top_security.json';
+
     protected const FILE_GHLOGIN_WO_COMPANY = 'gh_loginsWOCompany.json';
 
     protected const FILE_DATA_COMPANIES = 'var/data/companies.json';

@@ -53,6 +53,14 @@ The authentication use a Github Token.
  $ php bin/console traces:generate:topstats --config="config.yml"
  ## Files top_reviewers.json, top_issues.json, top_pullrequests.json are generated
  ## and contributors_prs.json is enriched with reviews / issuesOpened / pullRequestsOpened
+
+ # 9- Fetch published security advisories and their credits
+ $ php bin/console traces:fetch:security-advisories
+ ## A file gh_security_advisories.json is generated
+
+ # 10- Generate the security researchers leaderboard (research credits only)
+ $ php bin/console traces:generate:topsecurity --config="config.yml"
+ ## A file top_security.json is generated
 ```
 
 ## Configuring

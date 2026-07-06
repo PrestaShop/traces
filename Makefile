@@ -12,6 +12,8 @@ clean:
 	rm top_reviewers.json
 	rm top_issues.json
 	rm top_pullrequests.json
+	rm gh_security_advisories.json
+	rm top_security.json
 
 generate:
 	php bin/console traces:fetch:repositories --config="./config.dist.yml"
@@ -22,3 +24,5 @@ generate:
 	php bin/console traces:generate:newcontributors --limitNew=10 --config="./config.dist.yml"
 	php bin/console traces:generate:topcompanies --config="./config.dist.yml"
 	php bin/console traces:generate:topstats --config="./config.dist.yml"
+	php bin/console traces:fetch:security-advisories
+	php bin/console traces:generate:topsecurity --config="./config.dist.yml"
