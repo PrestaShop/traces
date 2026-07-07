@@ -8,6 +8,7 @@ use Github\Api\Repo;
 use Github\Api\User;
 use Github\Client;
 use Github\Exception\RuntimeException;
+use Github\HttpClient\Message\ResponseMediator;
 use Github\ResultPager;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
@@ -70,5 +71,35 @@ class Github
         $clientUser = $this->client->api('user');
 
         return $clientUser->show($login);
+    }
+
+    /**
+     * Published security advisories of a repository (the REST endpoint only
+     * exposes published ones to non-admin tokens).
+     *
+     * @return array<array<string, mixed>>
+     */
+    public function getRepoSecurityAdvisories(string $repository): array
+    {
+        $advisories = [];
+        $page = 1;
+        do {
+            try {
+                $response = $this->client->getHttpClient()->get(sprintf(
+                    '/repos/PrestaShop/%s/security-advisories?per_page=100&page=%d',
+                    rawurlencode($repository),
+                    $page
+                ));
+            } catch (RuntimeException $e) {
+                // Repositories with advisories disabled answer 404
+                return $advisories;
+            }
+            /** @var array<array<string, mixed>> $content */
+            $content = ResponseMediator::getContent($response);
+            $advisories = array_merge($advisories, $content);
+            ++$page;
+        } while (count($content) === 100);
+
+        return $advisories;
     }
 }
