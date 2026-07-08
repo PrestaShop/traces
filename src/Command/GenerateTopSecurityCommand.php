@@ -8,17 +8,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class GenerateTopSecurityCommand extends AbstractCommand
 {
-    // Only research-side credits are ranked here. Remediation credits
-    // (remediation_developer / reviewer / verifier) go to core developers who
-    // are already surfaced in the PR and commit leaderboards; counting them
-    // again would double-credit them and bury the security researchers this
-    // board exists to highlight.
+    // Credits split into two families. `count` sums both — the leaderboard
+    // ranks all credited security contributors together, and the front end
+    // shows the per-family breakdown next to it so the two kinds of work
+    // remain distinguishable.
     protected const RESEARCH_TYPES = ['reporter', 'finder', 'analyst', 'coordinator'];
+
+    protected const REMEDIATION_TYPES = ['remediation_developer', 'remediation_reviewer', 'remediation_verifier'];
 
     protected function configure(): void
     {
         $this->setName('traces:generate:topsecurity')
-            ->setDescription('Generate the security researchers leaderboard from fetched advisory credits')
+            ->setDescription('Generate the security contributors leaderboard from fetched advisory credits')
             ->addOption(
                 'ghtoken',
                 null,
@@ -62,23 +63,27 @@ class GenerateTopSecurityCommand extends AbstractCommand
      * @param array<array{ghsa_id:string|null, credits:array<array{login:string, avatar_url:string|null, html_url:string|null, type:string|null}>}> $advisories
      * @param array<string, mixed> $contributors
      *
-     * @return array{updatedAt: string, items: array<array{rank:int, login:string, name:string, avatar_url:string, html_url:string, count:int}>}
+     * @return array{updatedAt: string, items: array<array{rank:int, login:string, name:string, avatar_url:string, html_url:string, count:int, research:int, remediation:int}>}
      */
     public function buildRanking(array $advisories, array $contributors): array
     {
-        // Count, per login, the distinct advisories where they hold a research
-        // credit. Remediation-only contributors are intentionally left out (see
-        // RESEARCH_TYPES).
+        // Per login and per advisory, tag whether that person shows up in a
+        // research role, a remediation role, or both. Then per login, count
+        // the distinct advisories in each family; `count` totals both.
         $counts = [];
         $identities = [];
         foreach ($advisories as $advisory) {
-            $researchLogins = [];
+            $perLogin = [];
             foreach ($advisory['credits'] as $credit) {
-                if (!in_array($credit['type'] ?? '', self::RESEARCH_TYPES, true)) {
+                $type = $credit['type'] ?? '';
+                $isResearch = in_array($type, self::RESEARCH_TYPES, true);
+                $isRemediation = in_array($type, self::REMEDIATION_TYPES, true);
+                if (!$isResearch && !$isRemediation) {
                     continue;
                 }
                 $login = $credit['login'];
-                $researchLogins[$login] = true;
+                $perLogin[$login]['research'] = ($perLogin[$login]['research'] ?? false) || $isResearch;
+                $perLogin[$login]['remediation'] = ($perLogin[$login]['remediation'] ?? false) || $isRemediation;
                 if (!isset($identities[$login])) {
                     $identities[$login] = [
                         'avatar_url' => $credit['avatar_url'] ?? '',
@@ -86,14 +91,16 @@ class GenerateTopSecurityCommand extends AbstractCommand
                     ];
                 }
             }
-            foreach (array_keys($researchLogins) as $login) {
-                $counts[$login] = ($counts[$login] ?? 0) + 1;
+            foreach ($perLogin as $login => $families) {
+                $counts[$login]['count'] = ($counts[$login]['count'] ?? 0) + 1;
+                $counts[$login]['research'] = ($counts[$login]['research'] ?? 0) + ($families['research'] ? 1 : 0);
+                $counts[$login]['remediation'] = ($counts[$login]['remediation'] ?? 0) + ($families['remediation'] ? 1 : 0);
             }
         }
 
         $logins = array_keys($counts);
         usort($logins, function (string $a, string $b) use ($counts): int {
-            return ($counts[$b] <=> $counts[$a]) ?: strcmp($a, $b);
+            return ($counts[$b]['count'] <=> $counts[$a]['count']) ?: strcmp($a, $b);
         });
 
         $items = [];
@@ -109,7 +116,9 @@ class GenerateTopSecurityCommand extends AbstractCommand
                 'name' => (string) ($contributor['name'] ?? $login),
                 'avatar_url' => (string) ($contributor['avatar_url'] ?? $identities[$login]['avatar_url']),
                 'html_url' => (string) ($contributor['html_url'] ?? $identities[$login]['html_url']),
-                'count' => $counts[$login],
+                'count' => $counts[$login]['count'],
+                'research' => $counts[$login]['research'],
+                'remediation' => $counts[$login]['remediation'],
             ];
             ++$rank;
         }

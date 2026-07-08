@@ -58,7 +58,7 @@ The authentication use a Github Token.
  $ php bin/console traces:fetch:security-advisories
  ## A file gh_security_advisories.json is generated
 
- # 10- Generate the security researchers leaderboard (research credits only)
+ # 10- Generate the security contributors leaderboard (research + remediation)
  $ php bin/console traces:generate:topsecurity --config="config.yml"
  ## A file top_security.json is generated
 ```
