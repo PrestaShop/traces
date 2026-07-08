@@ -26,6 +26,12 @@ class Company
      * @var array<string, int>
      */
     public array $mergedContributionsByVersion = [];
+    /**
+     * @var string[]
+     */
+    public array $contributors = [];
+
+    public readonly string $slug;
 
     public function __construct(
         public readonly string $name,
@@ -40,15 +46,24 @@ class Company
         public readonly string $avatarUrl,
         public readonly string $htmlUrl,
     ) {
+        $this->slug = self::slugify($this->name);
+    }
+
+    private static function slugify(string $value): string
+    {
+        $ascii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+        $ascii = preg_replace('/[^A-Za-z0-9]+/', '-', $ascii ?: $value) ?? $value;
+        return strtolower(trim($ascii, '-')) ?: 'company';
     }
 
     /**
-     * @return array<string, array<int|string, int>|float|int|string>
+     * @return array<string, array<int|string, int>|float|int|string|string[]>
      */
     public function toArray(bool $rankByContributions): array
     {
         return [
             'name' => $this->name,
+            'slug' => $this->slug,
             'rank' => $rankByContributions ? $this->rankByContributions : $this->rankByPR,
             'rank_contributions' => $this->rankByContributions,
             'rank_pull_requests' => $this->rankByPR,
@@ -62,6 +77,7 @@ class Company
             'contributions_percent' => $this->contributionsPercent,
             'avatar_url' => $this->avatarUrl,
             'html_url' => $this->htmlUrl,
+            'contributors' => array_values(array_unique($this->contributors)),
         ];
     }
 }
