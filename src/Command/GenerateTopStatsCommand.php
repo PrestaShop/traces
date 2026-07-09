@@ -46,9 +46,9 @@ class GenerateTopStatsCommand extends AbstractCommand
 
         $this->fetchConfiguration($input->getOption('config'));
 
-        /** @var array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, reviewers:array<array{login:string, name:string|null, avatar_url:string|null, html_url:string|null}>}> $pullRequests */
+        /** @var array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, createdAt:string|null, reviewers:array<array{login:string, name:string|null, avatar_url:string|null, html_url:string|null, submittedAt:string|null}>}> $pullRequests */
         $pullRequests = json_decode(file_get_contents(self::FILE_PULLREQUESTS_ALL) ?: '', true);
-        /** @var array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, repository:string}> $issues */
+        /** @var array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, repository:string, createdAt:string|null}> $issues */
         $issues = json_decode(file_get_contents(self::FILE_ISSUES) ?: '', true);
         /** @var array<string, mixed> $contributors */
         $contributors = json_decode(file_get_contents(self::FILE_CONTRIBUTORS_PRS) ?: '', true);
@@ -59,9 +59,9 @@ class GenerateTopStatsCommand extends AbstractCommand
         $this->enrichContributors($contributors, $aggregate);
         file_put_contents(self::FILE_CONTRIBUTORS_PRS, json_encode($contributors, JSON_PRETTY_PRINT));
 
-        file_put_contents(self::FILE_TOP_REVIEWERS, json_encode($this->buildRanking($aggregate['reviews'], $contributors, $identities), JSON_PRETTY_PRINT));
-        file_put_contents(self::FILE_TOP_ISSUES, json_encode($this->buildRanking($aggregate['issuesOpened'], $contributors, $identities), JSON_PRETTY_PRINT));
-        file_put_contents(self::FILE_TOP_PULLREQUESTS, json_encode($this->buildRanking($aggregate['pullRequestsOpened'], $contributors, $identities), JSON_PRETTY_PRINT));
+        file_put_contents(self::FILE_TOP_REVIEWERS, json_encode($this->buildRanking($aggregate['reviews'], $aggregate['reviewsByYear'], $contributors, $identities), JSON_PRETTY_PRINT));
+        file_put_contents(self::FILE_TOP_ISSUES, json_encode($this->buildRanking($aggregate['issuesOpened'], $aggregate['issuesOpenedByYear'], $contributors, $identities), JSON_PRETTY_PRINT));
+        file_put_contents(self::FILE_TOP_PULLREQUESTS, json_encode($this->buildRanking($aggregate['pullRequestsOpened'], $aggregate['pullRequestsOpenedByYear'], $contributors, $identities), JSON_PRETTY_PRINT));
 
         $this->output->writeLn(['', 'Top stats generated.']);
 
@@ -69,21 +69,63 @@ class GenerateTopStatsCommand extends AbstractCommand
     }
 
     /**
-     * @param array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, reviewers:array<array{login:string, name:string|null, avatar_url:string|null, html_url:string|null}>}> $pullRequests
-     * @param array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, repository:string}> $issues
+     * Increments a scalar counter AND its parallel year map (additive-strict pattern).
      *
-     * @return array{reviews: array<string,int>, issuesOpened: array<string,int>, pullRequestsOpened: array<string,int>}
+     * @param array<string, int> $byYear
+     */
+    private static function bumpPair(int &$scalar, array &$byYear, string $year): void
+    {
+        $scalar++;
+        if (!isset($byYear[$year])) {
+            $byYear[$year] = 0;
+            krsort($byYear);
+        }
+        $byYear[$year]++;
+    }
+
+    /**
+     * Increments the scalar counter unconditionally, and bumps the year map only
+     * if $rawDate parses to a valid timestamp. An empty/malformed date must NOT
+     * fall back to "now" — that would silently misattribute old items to the
+     * current year and corrupt the byYear breakdown. Skipping the year bump
+     * (while still counting the scalar) keeps totals correct and honest.
+     *
+     * @param array<string, int> $byYear
+     */
+    private static function bumpPairFromDate(int &$scalar, array &$byYear, ?string $rawDate): void
+    {
+        $ts = ($rawDate !== null && $rawDate !== '') ? strtotime($rawDate) : false;
+        if ($ts === false) {
+            $scalar++;
+
+            return;
+        }
+        self::bumpPair($scalar, $byYear, date('Y', $ts));
+    }
+
+    /**
+     * @param array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, createdAt:string|null, reviewers:array<array{login:string, name:string|null, avatar_url:string|null, html_url:string|null, submittedAt:string|null}>}> $pullRequests
+     * @param array<array{number:int, login:string|null, name:string|null, avatar_url:string|null, html_url:string|null, repository:string, createdAt:string|null}> $issues
+     *
+     * @return array{reviews: array<string,int>, reviewsByYear: array<string,array<string,int>>, issuesOpened: array<string,int>, issuesOpenedByYear: array<string,array<string,int>>, pullRequestsOpened: array<string,int>, pullRequestsOpenedByYear: array<string,array<string,int>>}
      */
     public function aggregate(array $pullRequests, array $issues): array
     {
         $reviews = [];
+        $reviewsByYear = [];
         $pullRequestsOpened = [];
+        $pullRequestsOpenedByYear = [];
         $issuesOpened = [];
+        $issuesOpenedByYear = [];
 
         foreach ($pullRequests as $pullRequest) {
             $author = $pullRequest['login'] ?? null;
             if ($author !== null) {
-                $pullRequestsOpened[$author] = ($pullRequestsOpened[$author] ?? 0) + 1;
+                if (!isset($pullRequestsOpened[$author])) {
+                    $pullRequestsOpened[$author] = 0;
+                    $pullRequestsOpenedByYear[$author] = [];
+                }
+                self::bumpPairFromDate($pullRequestsOpened[$author], $pullRequestsOpenedByYear[$author], $pullRequest['createdAt'] ?? null);
             }
             // A review counts for its reviewer regardless of the PR author (even a
             // deleted/null author) — only self-reviews are excluded.
@@ -92,21 +134,32 @@ class GenerateTopStatsCommand extends AbstractCommand
                 if ($reviewerLogin === $author) {
                     continue;
                 }
-                $reviews[$reviewerLogin] = ($reviews[$reviewerLogin] ?? 0) + 1;
+                if (!isset($reviews[$reviewerLogin])) {
+                    $reviews[$reviewerLogin] = 0;
+                    $reviewsByYear[$reviewerLogin] = [];
+                }
+                self::bumpPairFromDate($reviews[$reviewerLogin], $reviewsByYear[$reviewerLogin], $reviewer['submittedAt'] ?? null);
             }
         }
 
         foreach ($issues as $issue) {
             $author = $issue['login'] ?? null;
             if ($author !== null) {
-                $issuesOpened[$author] = ($issuesOpened[$author] ?? 0) + 1;
+                if (!isset($issuesOpened[$author])) {
+                    $issuesOpened[$author] = 0;
+                    $issuesOpenedByYear[$author] = [];
+                }
+                self::bumpPairFromDate($issuesOpened[$author], $issuesOpenedByYear[$author], $issue['createdAt'] ?? null);
             }
         }
 
         return [
             'reviews' => $reviews,
+            'reviewsByYear' => $reviewsByYear,
             'issuesOpened' => $issuesOpened,
+            'issuesOpenedByYear' => $issuesOpenedByYear,
             'pullRequestsOpened' => $pullRequestsOpened,
+            'pullRequestsOpenedByYear' => $pullRequestsOpenedByYear,
         ];
     }
 
@@ -145,7 +198,7 @@ class GenerateTopStatsCommand extends AbstractCommand
 
     /**
      * @param array<string, mixed> $contributors
-     * @param array{reviews: array<string,int>, issuesOpened: array<string,int>, pullRequestsOpened: array<string,int>} $aggregate
+     * @param array{reviews: array<string,int>, reviewsByYear: array<string,array<string,int>>, issuesOpened: array<string,int>, issuesOpenedByYear: array<string,array<string,int>>, pullRequestsOpened: array<string,int>, pullRequestsOpenedByYear: array<string,array<string,int>>} $aggregate
      */
     private function enrichContributors(array &$contributors, array $aggregate): void
     {
@@ -154,20 +207,24 @@ class GenerateTopStatsCommand extends AbstractCommand
                 continue;
             }
             $entry['reviews'] = $aggregate['reviews'][$login] ?? 0;
+            $entry['reviewsByYear'] = $aggregate['reviewsByYear'][$login] ?? [];
             $entry['issuesOpened'] = $aggregate['issuesOpened'][$login] ?? 0;
+            $entry['issuesOpenedByYear'] = $aggregate['issuesOpenedByYear'][$login] ?? [];
             $entry['pullRequestsOpened'] = $aggregate['pullRequestsOpened'][$login] ?? 0;
+            $entry['pullRequestsOpenedByYear'] = $aggregate['pullRequestsOpenedByYear'][$login] ?? [];
         }
         unset($entry);
     }
 
     /**
      * @param array<string,int> $counts
+     * @param array<string,array<string,int>> $countsByYear
      * @param array<string, mixed> $contributors
      * @param array<string, array{name:string, avatar_url:string, html_url:string}> $identities
      *
-     * @return array{updatedAt: string, items: array<array{rank:int, login:string, name:string, avatar_url:string, html_url:string, count:int}>}
+     * @return array{updatedAt: string, items: array<array{rank:int, login:string, name:string, avatar_url:string, html_url:string, count:int, countByYear:array<string,int>}>}
      */
-    private function buildRanking(array $counts, array $contributors, array $identities): array
+    private function buildRanking(array $counts, array $countsByYear, array $contributors, array $identities): array
     {
         $logins = array_keys($counts);
         usort($logins, function (string $a, string $b) use ($counts): int {
@@ -191,11 +248,12 @@ class GenerateTopStatsCommand extends AbstractCommand
                 'avatar_url' => $identity['avatar_url'],
                 'html_url' => $identity['html_url'],
                 'count' => $counts[$login],
+                'countByYear' => $countsByYear[$login] ?? [],
             ];
             ++$rank;
         }
 
-        return ['updatedAt' => date('Y-m-d'), 'items' => $items];
+        return ['updatedAt' => (new \DateTimeImmutable())->format(DATE_ATOM), 'items' => $items];
     }
 
     /**

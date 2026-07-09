@@ -71,6 +71,7 @@ class FetchPullRequestsAllCommand extends AbstractCommand
                   }
                   nodes {
                     number
+                    createdAt
                     author {
                       login
                       avatarUrl
@@ -81,6 +82,7 @@ class FetchPullRequestsAllCommand extends AbstractCommand
                     }
                     reviews(first: 100) {
                       nodes {
+                        submittedAt
                         author {
                           login
                           avatarUrl
@@ -115,6 +117,7 @@ class FetchPullRequestsAllCommand extends AbstractCommand
                                 'name' => $reviewer['name'] ?? null,
                                 'avatar_url' => $reviewer['avatarUrl'] ?? null,
                                 'html_url' => $reviewer['url'] ?? null,
+                                'submittedAt' => $review['submittedAt'] ?? null,
                             ];
                         }
                     }
@@ -125,6 +128,7 @@ class FetchPullRequestsAllCommand extends AbstractCommand
                         'name' => $author['name'] ?? null,
                         'avatar_url' => $author['avatarUrl'] ?? null,
                         'html_url' => $author['url'] ?? null,
+                        'createdAt' => $node['createdAt'] ?? null,
                         'reviewers' => array_values($reviewers),
                     ];
                 }

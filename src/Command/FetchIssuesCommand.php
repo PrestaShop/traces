@@ -71,6 +71,7 @@ class FetchIssuesCommand extends AbstractCommand
                   }
                   nodes {
                     number
+                    createdAt
                     author {
                       login
                       avatarUrl
@@ -104,6 +105,7 @@ class FetchIssuesCommand extends AbstractCommand
                         'avatar_url' => $author['avatarUrl'] ?? null,
                         'html_url' => $author['url'] ?? null,
                         'repository' => $node['repository']['name'],
+                        'createdAt' => $node['createdAt'] ?? null,
                     ];
                 }
 
