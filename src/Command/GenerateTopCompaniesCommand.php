@@ -502,6 +502,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         }
 
         \file_put_contents(self::FILE_TOP_COMPANIES_PRS, json_encode([
+            'updatedAt' => (new DateTimeImmutable())->format(DATE_ATOM),
             'community' => $community->toArray(false),
             'companies' => array_map(function (Company $company) {
                 return $company->toArray(false);
@@ -600,6 +601,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
 
             return ($contributorA['mergedPullRequests'] > $contributorB['mergedPullRequests']) ? -1 : 1;
         });
+        $contributors['updatedAt'] = (new DateTimeImmutable())->format(DATE_ATOM);
         \file_put_contents(self::FILE_CONTRIBUTORS_PRS, json_encode($contributors, JSON_PRETTY_PRINT));
     }
 
