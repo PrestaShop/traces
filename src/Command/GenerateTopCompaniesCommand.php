@@ -84,17 +84,21 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         unset($contributors['updatedAt']);
         foreach ($contributors as $key => $contributor) {
             $contributors[$key]['mergedPullRequests'] = 0;
+            $contributors[$key]['mergedPullRequestsByYear'] = [];
 
             foreach (self::REPOSITORIES_CATEGORIES as $section => $repositories) {
                 $contributors[$key]['categories'][$section] = [
                     'total' => 0,
+                    'byYear' => [],
                     'repositories' => [],
+                    'repositoriesByYear' => [],
                 ];
                 foreach ($repositories as $repository) {
                     $categories[$section]['repositories'][$repository] = 0;
                 }
             }
             $contributors[$key]['repositories'] = [];
+            $contributors[$key]['repositoriesByYear'] = [];
         }
 
         $companiesData = json_decode(\file_get_contents(self::FILE_DATA_COMPANIES), true);
@@ -175,20 +179,32 @@ class GenerateTopCompaniesCommand extends AbstractCommand
                     return in_array($repository, self::REPOSITORIES_CATEGORIES[$item]) ? $item : $carry;
                 }, 'others');
 
-                ++$contributors[$authorLogin]['mergedPullRequests'];
+                self::bumpPair(
+                    $contributors[$authorLogin]['mergedPullRequests'],
+                    $contributors[$authorLogin]['mergedPullRequestsByYear'],
+                    $yearMerged
+                );
 
                 // Repositoies
                 if (!array_key_exists($repository, $contributors[$authorLogin]['repositories'])) {
                     $contributors[$authorLogin]['repositories'][$repository] = 0;
+                    $contributors[$authorLogin]['repositoriesByYear'][$repository] = [];
                 }
-                ++$contributors[$authorLogin]['repositories'][$repository];
+                self::bumpPair(
+                    $contributors[$authorLogin]['repositories'][$repository],
+                    $contributors[$authorLogin]['repositoriesByYear'][$repository],
+                    $yearMerged
+                );
                 // Section : Total
-                ++$contributors[$authorLogin]['categories'][$section]['total'];
+                $cat = &$contributors[$authorLogin]['categories'][$section];
+                self::bumpPair($cat['total'], $cat['byYear'], $yearMerged);
                 // Section : Repositories
-                if (!array_key_exists($repository, $contributors[$authorLogin]['categories'][$section]['repositories'])) {
-                    $contributors[$authorLogin]['categories'][$section]['repositories'][$repository] = 0;
+                if (!array_key_exists($repository, $cat['repositories'])) {
+                    $cat['repositories'][$repository] = 0;
+                    $cat['repositoriesByYear'][$repository] = [];
                 }
-                ++$contributors[$authorLogin]['categories'][$section]['repositories'][$repository];
+                self::bumpPair($cat['repositories'][$repository], $cat['repositoriesByYear'][$repository], $yearMerged);
+                unset($cat);
             }
 
             $company = $this->extractCompany($pullRequestData);
@@ -196,6 +212,9 @@ class GenerateTopCompaniesCommand extends AbstractCommand
                 $objCompany = $company;
             } else {
                 $objCompany = $community;
+            }
+            if ($company && $authorLogin !== '') {
+                $company->contributors[] = $authorLogin;
             }
             // Company : Total PRs
             ++$objCompany->mergedPullRequests;
@@ -582,5 +601,20 @@ class GenerateTopCompaniesCommand extends AbstractCommand
             return ($contributorA['mergedPullRequests'] > $contributorB['mergedPullRequests']) ? -1 : 1;
         });
         \file_put_contents(self::FILE_CONTRIBUTORS_PRS, json_encode($contributors, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * Increments a scalar counter AND its parallel year map (additive-strict pattern).
+     *
+     * @param array<string, int> $byYear
+     */
+    private static function bumpPair(int &$scalar, array &$byYear, string $year): void
+    {
+        $scalar++;
+        if (!isset($byYear[$year])) {
+            $byYear[$year] = 0;
+            krsort($byYear);
+        }
+        $byYear[$year]++;
     }
 }
