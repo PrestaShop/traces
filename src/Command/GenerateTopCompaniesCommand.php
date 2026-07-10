@@ -612,11 +612,11 @@ class GenerateTopCompaniesCommand extends AbstractCommand
      */
     private static function bumpPair(int &$scalar, array &$byYear, string $year): void
     {
-        $scalar++;
+        ++$scalar;
         if (!isset($byYear[$year])) {
             $byYear[$year] = 0;
             krsort($byYear);
         }
-        $byYear[$year]++;
+        ++$byYear[$year];
     }
 }

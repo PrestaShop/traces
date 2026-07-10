@@ -53,6 +53,7 @@ class Company
     {
         $ascii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
         $ascii = preg_replace('/[^A-Za-z0-9]+/', '-', $ascii ?: $value) ?? $value;
+
         return strtolower(trim($ascii, '-')) ?: 'company';
     }
 

@@ -2,6 +2,7 @@
 
 namespace PrestaShop\Traces\Command;
 
+use DateTimeImmutable;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -75,12 +76,12 @@ class GenerateTopStatsCommand extends AbstractCommand
      */
     private static function bumpPair(int &$scalar, array &$byYear, string $year): void
     {
-        $scalar++;
+        ++$scalar;
         if (!isset($byYear[$year])) {
             $byYear[$year] = 0;
             krsort($byYear);
         }
-        $byYear[$year]++;
+        ++$byYear[$year];
     }
 
     /**
@@ -96,7 +97,7 @@ class GenerateTopStatsCommand extends AbstractCommand
     {
         $ts = ($rawDate !== null && $rawDate !== '') ? strtotime($rawDate) : false;
         if ($ts === false) {
-            $scalar++;
+            ++$scalar;
 
             return;
         }
@@ -253,7 +254,7 @@ class GenerateTopStatsCommand extends AbstractCommand
             ++$rank;
         }
 
-        return ['updatedAt' => (new \DateTimeImmutable())->format(DATE_ATOM), 'items' => $items];
+        return ['updatedAt' => (new DateTimeImmutable())->format(DATE_ATOM), 'items' => $items];
     }
 
     /**
