@@ -58,7 +58,7 @@ class Company
     }
 
     /**
-     * @return array<string, array<int|string, int>|float|int|string|string[]>
+     * @return array<string, mixed>
      */
     public function toArray(bool $rankByContributions): array
     {
@@ -79,6 +79,17 @@ class Company
             'avatar_url' => $this->avatarUrl,
             'html_url' => $this->htmlUrl,
             'contributors' => array_values(array_unique($this->contributors)),
+            'employees' => array_map(function (Employee $employee): array {
+                return [
+                    'login' => $employee->login,
+                    'time_frames' => array_map(function (TimeFrame $timeFrame): array {
+                        return [
+                            'start_date' => $timeFrame->startTime->format('Y-m-d'),
+                            'end_date' => $timeFrame->endTime?->format('Y-m-d'),
+                        ];
+                    }, $employee->timeFrames),
+                ];
+            }, $this->employees),
         ];
     }
 }
