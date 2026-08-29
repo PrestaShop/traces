@@ -61,6 +61,14 @@ The authentication use a Github Token.
  # 10- Generate the security contributors leaderboard (research + remediation)
  $ php bin/console traces:generate:topsecurity --config="config.yml"
  ## A file top_security.json is generated
+
+ # 11- Fetch QA label events (all QA-prefixed validation labels) from merged PRs
+ $ php bin/console traces:fetch:qaevents
+ ## A file gh_qa_events.json is generated
+
+ # 12- Generate the QA contributors leaderboard
+ $ php bin/console traces:generate:topqa --config="config.yml"
+ ## A file top_qa.json is generated
 ```
 
 ## Configuring
