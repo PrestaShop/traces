@@ -14,6 +14,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class GenerateTopCompaniesCommand extends AbstractCommand
 {
+    private const COMMUNITY_NAME = 'Open Source Community';
+
     /**
      * @var Company[]
      */
@@ -144,7 +146,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         // Clean PR Listing
         $numPRRemoved = 0;
         foreach ($this->companies as $company) {
-            if ($company->name === 'Open Source Community') {
+            if ($company->name === self::COMMUNITY_NAME) {
                 $community = $company;
                 break;
             }
@@ -370,22 +372,31 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         }
         if (!empty($matchCompany)) {
             $company = $this->getCompanyByAlias($matchCompany);
-            if ($company) {
+
+            // A real sponsor company was declared: it takes precedence
+            if ($company && !$this->isCommunity($company)) {
                 return $company;
             }
-            $this->output->writeln(
-                'Sponsor Company Not Found : '
-                . $datum['repository']['name']
-                . '#' . $datum['number']
-                . ' => ' . $datum['author']['login']
-                . '/' . $matchCompany
-            );
-            if (!isset($this->unknownSponsorCompanies[$matchCompany])) {
-                $this->unknownSponsorCompanies[$matchCompany] = 0;
-            }
-            ++$this->unknownSponsorCompanies[$matchCompany];
 
-            return null;
+            // Unknown sponsor company: keep the existing behaviour
+            if (!$company) {
+                $this->output->writeln(
+                    'Sponsor Company Not Found : '
+                    . $datum['repository']['name']
+                    . '#' . $datum['number']
+                    . ' => ' . $authorLogin
+                    . '/' . $matchCompany
+                );
+                if (!isset($this->unknownSponsorCompanies[$matchCompany])) {
+                    $this->unknownSponsorCompanies[$matchCompany] = 0;
+                }
+                ++$this->unknownSponsorCompanies[$matchCompany];
+
+                return null;
+            }
+
+            // The value is a template placeholder ("~", "-", "N/A"...) meaning
+            // no sponsor was declared: fall back to the author's company.
         }
 
         // Extract company from "Author"
@@ -411,6 +422,11 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         }
 
         return null;
+    }
+
+    protected function isCommunity(Company $company): bool
+    {
+        return $company->name === self::COMMUNITY_NAME;
     }
 
     protected function extractCompanyFromAuthor(string $login, string $createdAt): ?Company
