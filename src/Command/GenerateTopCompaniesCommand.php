@@ -230,6 +230,17 @@ class GenerateTopCompaniesCommand extends AbstractCommand
                 krsort($objCompany->mergedPullRequestsByYear);
             }
             ++$objCompany->mergedPullRequestsByYear[$yearMerged];
+            // Company : Merged PRs by repository (total & per year)
+            $companyRepository = $pullRequestData['repository']['name'];
+            if (!array_key_exists($companyRepository, $objCompany->repositories)) {
+                $objCompany->repositories[$companyRepository] = 0;
+                $objCompany->repositoriesByYear[$companyRepository] = [];
+            }
+            self::bumpPair(
+                $objCompany->repositories[$companyRepository],
+                $objCompany->repositoriesByYear[$companyRepository],
+                $yearMerged
+            );
             // Company : Total contributions per year
             if (!isset($objCompany->mergedContributionsByYear[$yearMerged])) {
                 $objCompany->mergedContributionsByYear[$yearMerged] = 0;
