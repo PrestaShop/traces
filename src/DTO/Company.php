@@ -26,6 +26,10 @@ class Company
      * @var array<string, int>
      */
     public array $mergedContributionsByVersion = [];
+    /** @var array<string, int> */
+    public array $repositories = [];
+    /** @var array<string, array<string, int>> */
+    public array $repositoriesByYear = [];
     /**
      * @var string[]
      */
@@ -77,6 +81,8 @@ class Company
             'contributions_by_version' => $this->mergedContributionsByVersion,
             'contributions_by_year' => $this->mergedContributionsByYear,
             'contributions_percent' => $this->contributionsPercent,
+            'repositories' => $this->repositories,
+            'repositories_by_year' => $this->repositoriesByYear,
             'avatar_url' => $this->avatarUrl,
             'html_url' => $this->htmlUrl,
             'github_url' => $this->githubUrl,
