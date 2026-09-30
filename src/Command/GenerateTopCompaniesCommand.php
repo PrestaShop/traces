@@ -321,7 +321,7 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         $rankByContributions = 0;
         $lastScore = null;
         foreach ($rankedCompaniesByContributions as $company) {
-            if ($lastScore === null || $lastScore !== $company->mergedPullRequests) {
+            if ($lastScore === null || $lastScore !== $company->contributions) {
                 ++$rankByContributions;
             }
 
