@@ -7,7 +7,7 @@
         "knplabs/github-api": "^3.14",
         "symfony/http-client": "^8.0",
         "nyholm/psr7": "^1.8",
-        "cache/filesystem-adapter": "^1.2",
+        "cache/filesystem-adapter": "^3.0",
         "symfony/dotenv": "^8.0",
         "symfony/console": "^8.0",
         "ext-json": "*",
