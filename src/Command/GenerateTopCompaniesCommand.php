@@ -377,8 +377,8 @@ class GenerateTopCompaniesCommand extends AbstractCommand
         $matchCompany = '';
         $authorLogin = $datum['author']['login'] ?? '';
 
-        // Extract company from "Sponsor Company"
-        if (preg_match('/\|\h+Sponsor company\h+\|\h+([^\r\n]+)/mu', $datum['body'], $matches)) {
+        // Extract company from "Sponsor Company", up to the closing pipe of the cell if any
+        if (preg_match('/\|\h+Sponsor company\h+\|\h*([^|\r\n]*)/mu', $datum['body'], $matches)) {
             $matchCompany = strtolower(trim($matches[1]));
         }
         if (!empty($matchCompany)) {
