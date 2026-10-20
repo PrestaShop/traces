@@ -25,6 +25,11 @@
             "PrestaShop\\Traces\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "PrestaShop\\Traces\\Tests\\": "tests/"
+        }
+    },
     "config": {
         "platform": {
             "php": "8.4.0"
@@ -35,6 +40,7 @@
     },
     "require-dev": {
         "phpstan/phpstan": "^2.1",
-        "phpstan/phpstan-symfony": "^2.0"
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpunit/phpunit": "^12.0"
     }
 }

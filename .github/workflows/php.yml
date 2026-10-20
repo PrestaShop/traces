@@ -47,3 +47,21 @@ jobs:
 
         -   name: Run phpstan
             run: ./vendor/bin/phpstan analyse -c phpstan.neon.dist
+
+  phpunit:
+    name: PHPUnit
+    runs-on: ubuntu-latest
+    steps:
+        -   name: Setup PHP
+            uses: shivammathur/setup-php@v2
+            with:
+                php-version: 8.4
+                extensions: xml
+
+        -   uses: actions/checkout@v7
+
+        -   name: Composer Install
+            run: composer install --ansi --prefer-dist --no-interaction --no-progress
+
+        -   name: Run PHPUnit
+            run: ./vendor/bin/phpunit

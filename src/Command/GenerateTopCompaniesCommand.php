@@ -370,17 +370,28 @@ class GenerateTopCompaniesCommand extends AbstractCommand
     }
 
     /**
+     * Value of the "Sponsor company" row of a pull request description, lowercased,
+     * or an empty string when the row is missing or empty.
+     */
+    public static function extractSponsorCompany(string $body): string
+    {
+        // Up to the closing pipe of the cell if any
+        if (preg_match('/\|\h+Sponsor company\h+\|\h*([^|\r\n]*)/mu', $body, $matches)) {
+            return strtolower(trim($matches[1]));
+        }
+
+        return '';
+    }
+
+    /**
      * @param array{author?: array{login: string}, body: string, createdAt: string, number: int, repository: array{name: string}, mergedAt: string} $datum
      */
     protected function extractCompany(array $datum): ?Company
     {
-        $matchCompany = '';
         $authorLogin = $datum['author']['login'] ?? '';
 
-        // Extract company from "Sponsor Company", up to the closing pipe of the cell if any
-        if (preg_match('/\|\h+Sponsor company\h+\|\h*([^|\r\n]*)/mu', $datum['body'], $matches)) {
-            $matchCompany = strtolower(trim($matches[1]));
-        }
+        // Extract company from "Sponsor Company"
+        $matchCompany = self::extractSponsorCompany($datum['body']);
         if (!empty($matchCompany)) {
             $company = $this->getCompanyByAlias($matchCompany);
 

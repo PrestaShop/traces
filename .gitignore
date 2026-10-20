@@ -4,6 +4,7 @@
 /var/cache/
 /vendor/
 .php-cs-fixer.cache
+.phpunit.cache
 .env
 
 # Config
