@@ -4,7 +4,7 @@ namespace PrestaShop\Traces\Tests\Data;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use PrestaShop\Traces\Command\GenerateTopCompaniesCommand;
+use PrestaShop\Traces\Service\SponsorCompanyExtractor;
 
 class CompaniesJsonTest extends TestCase
 {
@@ -81,7 +81,7 @@ class CompaniesJsonTest extends TestCase
     #[DataProvider('provideSponsorRows')]
     public function testReportedSponsorsResolveToACompany(string $row, string $expected): void
     {
-        $sponsor = GenerateTopCompaniesCommand::extractSponsorCompany($row . "\n");
+        $sponsor = (new SponsorCompanyExtractor())->extract($row . "\n");
 
         $found = null;
         foreach (self::companies() as $company) {

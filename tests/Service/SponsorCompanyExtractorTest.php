@@ -1,12 +1,12 @@
 <?php
 
-namespace PrestaShop\Traces\Tests\Command;
+namespace PrestaShop\Traces\Tests\Service;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use PrestaShop\Traces\Command\GenerateTopCompaniesCommand;
+use PrestaShop\Traces\Service\SponsorCompanyExtractor;
 
-class ExtractSponsorCompanyTest extends TestCase
+class SponsorCompanyExtractorTest extends TestCase
 {
     /**
      * @return iterable<string, array{string, string}>
@@ -30,8 +30,8 @@ class ExtractSponsorCompanyTest extends TestCase
     }
 
     #[DataProvider('provideBodies')]
-    public function testExtractSponsorCompany(string $body, string $expected): void
+    public function testExtract(string $body, string $expected): void
     {
-        self::assertSame($expected, GenerateTopCompaniesCommand::extractSponsorCompany($body));
+        self::assertSame($expected, (new SponsorCompanyExtractor())->extract($body));
     }
 }
