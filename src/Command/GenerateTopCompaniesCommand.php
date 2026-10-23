@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use PrestaShop\Traces\DTO\Company;
 use PrestaShop\Traces\DTO\Employee;
 use PrestaShop\Traces\DTO\TimeFrame;
+use PrestaShop\Traces\Service\SponsorCompanyExtractor;
 use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -38,6 +39,12 @@ class GenerateTopCompaniesCommand extends AbstractCommand
      * @var array<string, int>
      */
     protected array $unknownSponsorCompanies = [];
+
+    public function __construct(
+        private readonly SponsorCompanyExtractor $sponsorCompanyExtractor = new SponsorCompanyExtractor(),
+    ) {
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
@@ -374,13 +381,10 @@ class GenerateTopCompaniesCommand extends AbstractCommand
      */
     protected function extractCompany(array $datum): ?Company
     {
-        $matchCompany = '';
         $authorLogin = $datum['author']['login'] ?? '';
 
         // Extract company from "Sponsor Company"
-        if (preg_match('/\|\h+Sponsor company\h+\|\h+([^\r\n]+)/mu', $datum['body'], $matches)) {
-            $matchCompany = strtolower(trim($matches[1]));
-        }
+        $matchCompany = $this->sponsorCompanyExtractor->extract($datum['body']);
         if (!empty($matchCompany)) {
             $company = $this->getCompanyByAlias($matchCompany);
 

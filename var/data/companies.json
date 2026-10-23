@@ -19,7 +19,8 @@
       "none",
       "Your company or customer's name goes here (if applicable).",
       "[Your company name, if applicable]",
-      "Applied in Dolibarr (not specifically sponsor company)."
+      "Applied in Dolibarr (not specifically sponsor company).",
+      "—"
     ]
   },
   {
@@ -744,6 +745,12 @@
     ]
   },
   {
+    "name": "Boring Investments",
+    "aliases": [
+      "Boring Investments"
+    ]
+  },
+  {
     "name": "Codencode",
     "html_url": "https://www.codencode.it",
     "avatar_url": "https://www.codencode.it/codencode-github-logo.jpg",
@@ -753,7 +760,8 @@
       "Codencode snc",
       "Codencode s.n.c",
       "Codencode S.N.C",
-      "Codencode SNC"
+      "Codencode SNC",
+      "Codencode  snc"
     ]
   },
   {
@@ -823,6 +831,13 @@
     ]
   },
   {
+    "name": "Difadi",
+    "html_url": "https://difadi.com",
+    "aliases": [
+      "difadi.com"
+    ]
+  },
+  {
     "name": "e-frogg",
     "html_url": "https://www.e-frogg.com",
     "aliases": [
@@ -841,6 +856,12 @@
     "html_url": "https://www.eflyshop.com.ar",
     "aliases": [
       "eflyshop"
+    ]
+  },
+  {
+    "name": "Enkore",
+    "aliases": [
+      "Enkore"
     ]
   },
   {
@@ -895,6 +916,12 @@
     "name": "Giuseppe Tripiciano",
     "aliases": [
       "giuseppe tripiciano"
+    ]
+  },
+  {
+    "name": "GreenMouse",
+    "aliases": [
+      "GreenMouse"
     ]
   },
   {
@@ -1086,6 +1113,15 @@
     ]
   },
   {
+    "name": "Metin Eren",
+    "html_url": "https://www.metineren.com",
+    "aliases": [
+      "metin eren",
+      "metin eren.",
+      "www.metineren.com"
+    ]
+  },
+  {
     "name": "New Orange",
     "html_url": "https://neworange.agency",
     "aliases": [
@@ -1178,6 +1214,14 @@
   {
     "name": "Profileo",
     "html_url": "https://www.profileo.com/"
+  },
+  {
+    "name": "Recart Sim",
+    "html_url": "https://shop.recart-sim.com",
+    "aliases": [
+      "https://shop.recart-sim.com/cs/",
+      "shop.recart-sim.com"
+    ]
   },
   {
     "name": "Rubén",
@@ -1312,7 +1356,8 @@
     "name": "Vilkas",
     "html_url": "https://www.vilkas.fi",
     "aliases": [
-      "vilkas group"
+      "vilkas group",
+      "Vilkas Group Oy"
     ]
   },
   {
@@ -1370,6 +1415,12 @@
     "aliases": [
       "@Wepika",
       "@Wepika."
+    ]
+  },
+  {
+    "name": "ZM40",
+    "aliases": [
+      "ZM40"
     ]
   }
 ]
