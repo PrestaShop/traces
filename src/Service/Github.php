@@ -10,8 +10,8 @@ use Github\Client;
 use Github\Exception\RuntimeException;
 use Github\HttpClient\Message\ResponseMediator;
 use Github\ResultPager;
-use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
 
 class Github
 {
@@ -22,7 +22,7 @@ class Github
 
     public function __construct(string $cacheDir, ?string $ghtoken = null)
     {
-        $filesystemAdapter = new Local($cacheDir);
+        $filesystemAdapter = new LocalFilesystemAdapter($cacheDir);
         $filesystem = new Filesystem($filesystemAdapter);
         $pool = new FilesystemCachePool($filesystem);
 
